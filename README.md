@@ -1,8 +1,16 @@
-## Counter Strike Source: Community Edition
+## New Readme:
+This repo fixes bot pathfinding and ragdoll crashes. It also reimplements valves prototype gamemode for left 4 dead. Terror-Strike or Terror.
+You must add the TERROR macro to the server project to enable this.
+
+## My game crashes!
+First make sure you have Counter-Strike: Source installed.
+If this is while loading a map it might be an unsupported navmesh file version. Remove this file and try again.
+
+## Original Readme: Counter Strike Source: Community Edition
 
 **Counter Strike Source: Community Edition** is open source port of the leaked 2007 Source engine leak of the award winner Counter Strike Source. 
 
-This mod is orient to Community so everyone can grow the mod whit his Contributions.
+This mod is orient to Community so everyone can grow the mod with his Contributions.
 Currently this mod is in a pre-alpha state so don’t expected any class of bugs.
 
 ### Goals
@@ -41,3 +49,5 @@ Although this mod is based on SourcePlusPlus's CSS Port, some things will not wo
 |         **NicolasDe**          |                 **For his amazing GameUI2**                  |
 |        **TotallyMehis**        | **Creator of Zombie Master: Reborn and some code that is used here** |
 |         **Spirrwell**          |                   **FMOD Implementation**                    |
+|         **BillySB**          |                   **Basic Terror-Strike gamemode**                    |
+|         **Sregor**          |                   **Left 4 Dead common infected player models.**                    |
