@@ -169,7 +169,7 @@ ConVar ammo_smokegrenade_max( "ammo_smokegrenade_max", "1", FCVAR_REPLICATED );
 ConVar terrorstrike_zombiespeed("terror_zombiespeed", "375", FCVAR_NOTIFY, "Sets the max movement speed of terror strike zombies.");
 ConVar terrorstrike_deathalerts("terror_deathsounds", "1", FCVAR_NOTIFY, "Enables player death alert sounds. Must be either 1 or 0."); //
 ConVar terrorstrike_infiniteammo("terror_infiniteammo", "1", FCVAR_NOTIFY, "Gives player ammo once fully running out"); //
-ConVar terrorstrike_maxzombies("terror_maxzombies", "20", FCVAR_REPLICATED, "Max number of zombies. If you have enough bot profiles to cover it."); //
+ConVar terrorstrike_maxzombies("terror_maxzombies", "28", FCVAR_REPLICATED, "Max number of zombies. If you have enough bot profiles to cover it. 28 by default leaving 4 player slots open."); //
 ConVar terrorstrike_usemodels("terror_usemodels", "1", FCVAR_REPLICATED, "Should zombies use the zombie models? this is a bool 1 or 0"); //
 ConVar terrorstrike_preventteam("terror_disable_join_ct", "1", FCVAR_REPLICATED, "This prevents humans from joining the bot team."); //
 ConVar terrorstrike_zombiedmg("terror_zombiedmg", "8", FCVAR_NOTIFY, "This value is used to divide the zombie knife damage.");
