@@ -1,0 +1,37 @@
+VertexLitGeneric
+{
+	$baseTexture "models/player/gregrogers/infectedl4d1/gregrogers_m_head_base_police"
+	$bumpmap "models/player/gregrogers/infectedl4d1/gregrogers_flat_nrml"
+	$color2 "[.9 .9 .9]"
+	$alphatest 1
+	$lightwarptexture "models/player/gregrogers/infectedl4d1/gregrogers_lightwarp_minimalistic"
+	$phong 1
+	$phongboost 200
+//	$phongtint "[.85 .85 1]"
+	$phongexponent 3
+	$phongfresnelranges "[.020 .035 .150]"
+	$normalmapalphaphongmask 1
+	$phongexponenttexture "models/player/gregrogers/infectedl4d1/gregrogers_explight2"
+	$phongalbedotint 1
+	$detail "models/player/gregrogers/infectedl4d1/gregrogers_m_head_diff"
+	$detailscale        "1"
+	$detailblendfactor  ".94"
+	$detailblendmode    "2"
+
+"Proxies"
+   {
+	"EntityRandom"
+           	 {
+                "scale" "127"
+                "resultVar" "$frame"
+               	}
+
+	"EntityRandom"
+           	 {
+                "scale" "5.40958976"
+                "resultVar" "$detailframe"
+               	}
+
+   }
+
+}

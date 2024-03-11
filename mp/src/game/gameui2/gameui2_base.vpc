@@ -1,0 +1,171 @@
+//-----------------------------------------------------------------------------
+//	GAMEUI2_BASE.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Macro GAMENAME 	"community"
+$Macro OUTBINNAME	"gameui2"
+$Macro OUTBINDIR	"$SRCDIR\..\game\$GAMENAME\bin"
+$Macro SRCDIR		"..\.."
+
+$Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
+
+$Configuration	"Debug"
+{
+	$General
+	{
+		$OutputDirectory			".\Debug_$GAMENAME"			[$WIN32]
+		$IntermediateDirectory		".\Debug_$GAMENAME"			[$WIN32]
+	}
+}
+
+$Configuration	"Release"
+{
+	$General
+	{
+		$OutputDirectory			".\Release_$GAMENAME"		[$WIN32]
+		$IntermediateDirectory		".\Release_$GAMENAME"		[$WIN32]
+	}
+}
+
+$Configuration
+{
+	$General
+	{
+			$OutputDirectory			".\$GAMENAME"		[$OSXALL]
+	}
+	
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;.\;$SRCDIR\vgui2\include;$SRCDIR\vgui2\controls;$SRCDIR\game\client;$SRCDIR\game\client\game_controls,..\..\public"
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\gameui2;$SRCDIR\game\gameui2\vgui2d;$SRCDIR\game\gameui2\buttons;$SRCDIR\game\gameui2\panels;$SRCDIR\thirdparty\hlib\lib"
+		$PreprocessorDefinitions		"$BASE;SUPPRESS_INVALID_PARAMETER_NO_INFO;_CRT_NO_VA_START_VALIDATION;NO_STRING_T;GAMEUI2_DLL;GAMEUI2_EXPORTS;CLIENT_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;DISABLE_PROTECTED_THINGS;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead"
+	}
+
+	$Linker
+	{
+		$SystemLibraries				"iconv" [$OSXALL]
+		$SystemFrameworks				"Carbon" [$OSXALL]
+		$SystemLibraries				"rt" [$LINUXALL]
+		$IgnoreImportLibrary			"TRUE"
+		$AdditionalLibraryDirectories	"$BASE;$SRCDIR\thirdparty\hlib\lib"
+		$AdditionalDependencies			"$BASE Ws2_32.lib odbc32.lib odbccp32.lib Shlwapi.lib winmm.lib HLLib.lib" [$WIN32]
+		$IgnoreSpecificLibrary			"libc;libcd;libcmtd;msvcrt"
+	}
+}
+
+$Project "GameUI2"
+{
+	$Folder "External Stuff"
+	{
+		$File	"$SRCDIR\public\vgui_controls\vgui_controls.cpp"
+		$File	"$SRCDIR\common\language.cpp"
+	}
+	
+	$Folder	"Source Files"
+	{
+
+		$Folder	"Buttons"
+		{
+			$File	"$SRCDIR\game\gameui2\buttons\button_mainmenu.cpp"
+			$File	"$SRCDIR\game\gameui2\buttons\button_panel.cpp"
+		}
+			
+		$Folder	"Main menu"
+		{
+			$File	"$SRCDIR\game\gameui2\mainmenu.cpp"
+		}
+
+		$Folder	"Panels"
+		{
+			$File	"$SRCDIR\game\gameui2\panels\panel_options.cpp"
+			$File	"$SRCDIR\game\gameui2\panels\panel_quitgame.cpp"
+		}
+
+		$Folder	"VGUI 2D"
+		{
+			$File	"$SRCDIR\game\gameui2\vgui2d\button2d.cpp"
+			$File	"$SRCDIR\game\gameui2\vgui2d\frame2d.cpp"
+			$File	"$SRCDIR\game\gameui2\vgui2d\panel2d.cpp"
+		}
+
+		$File	"$SRCDIR\game\gameui2\basepanel.cpp"
+		$File	"$SRCDIR\game\gameui2\gameui2_util.cpp"
+		$File	"$SRCDIR\game\gameui2\gameui2_interface.cpp"
+	}
+
+	$Folder	"Public Header Files"
+	{
+		$File	"$SRCDIR\public\iachievementmgr.h"
+		$File	"$SRCDIR\public\game\client\IGameClientExports.h"
+		$File	"$SRCDIR\common\GameUI\IGameConsole.h"
+		$File	"$SRCDIR\public\IGameUIFuncs.h"
+		$File	"$SRCDIR\public\tier1\interface.h"
+		$File	"$SRCDIR\common\IRunGameEngine.h"
+		$File	"$SRCDIR\common\IVGuiModule.h"
+		$File	"$SRCDIR\common\IVGuiModuleLoader.h"
+		$File	"$SRCDIR\public\savegame_version.h"
+		$File	"$SRCDIR\common\language.h"
+	}
+	
+	$Folder	"Header Files"
+	{
+		$Folder	"Buttons"
+		{
+			$File	"$SRCDIR\game\gameui2\buttons\button_mainmenu.h"
+			$File	"$SRCDIR\game\gameui2\buttons\button_panel.h"
+		}
+			
+		$Folder	"Main menu"
+		{
+			$File	"$SRCDIR\game\gameui2\mainmenu.h"
+		}
+
+		$Folder	"Panels"
+		{
+			$File	"$SRCDIR\game\gameui2\panels\panel_options.h"
+			$File	"$SRCDIR\game\gameui2\panels\panel_quitgame.h"
+		}
+
+		$Folder	"VGUI 2D"
+		{
+			$File	"$SRCDIR\game\gameui2\vgui2d\button2d.h"
+			$File	"$SRCDIR\game\gameui2\vgui2d\frame2d.h"
+			$File	"$SRCDIR\game\gameui2\vgui2d\panel2d.h"
+		}
+
+		$File	"$SRCDIR\game\gameui2\basepanel.h"
+		$File	"$SRCDIR\game\gameui2\igameui2.h"
+		$File	"$SRCDIR\game\gameui2\gameui2_util.h"
+		$File	"$SRCDIR\game\gameui2\gameui2_interface.h"
+	}
+
+	$Folder	"Link Libraries"
+	{
+		$Lib		bitmap
+		$Lib		choreoobjects
+		$Lib		mathlib
+		$Lib		matsys_controls
+		$Lib		tier1
+		$Lib		tier2
+		$Lib		tier3
+		$Lib		vgui_controls
+		$Lib		vtf
+		$ImpLib		steam_api
+		
+		$ImpLib		"$SRCDIR\thirdparty\hlib\lib\HLLib"
+		
+		$Lib $LIBCOMMON/libcrypto [$POSIX]
+
+		$ImpLib	"$LIBCOMMON\curl"	  [$OSXALL]
+
+		$Lib	"$LIBCOMMON\libcurl" [$WIN32]
+		$Lib   "libz" [$WIN32]
+
+		$Libexternal libz [$LINUXALL]
+		$Libexternal "$LIBCOMMON/libcurl" [$LINUXALL]
+		$Libexternal "$LIBCOMMON/libcurlssl" [$LINUXALL]
+		$Libexternal "$LIBCOMMON/libssl" [$LINUXALL]
+ 	}
+}
