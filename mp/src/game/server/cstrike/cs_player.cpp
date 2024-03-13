@@ -104,9 +104,11 @@ public:
 	int ShouldMoveTo( IPhysicsObject *pObject, const Vector &position )
 	{
 		CCSPlayer *pPlayer = (CCSPlayer *)pObject->GetGameData();
-		if ( pPlayer )
+
+		if (pPlayer)
 		{
-			if ( pPlayer->TouchedPhysics() )
+
+			if (pPlayer->TouchedPhysics())
 			{
 				return 0;
 			}
@@ -492,6 +494,21 @@ void CCSPlayer::Precache()
 
 	PrecacheModel ( "sprites/glow01.vmt" );
 
+#ifdef TERROR
+	// Precache zombie models too if enabled and is terror strike.
+	if (CSGameRules()->IsTerrorStrikeMap() && terrorstrike_usemodels.GetBool())
+	{
+		PrecacheModel("models/player/gregrogers/infectedl4d1/male_worker/gregrogers.mdl");
+		PrecacheModel("models/player/gregrogers/infectedl4d1/male_rural/gregrogers.mdl");
+		PrecacheModel("models/player/gregrogers/infectedl4d1/male/gregrogers.mdl");
+		PrecacheModel("models/player/gregrogers/infectedl4d1/female/gregrogers.mdl");
+		PrecacheModel("models/player/gregrogers/infectedl4d1/male_suit/gregrogers.mdl");
+		PrecacheModel("models/player/gregrogers/infectedl4d1/male_police/gregrogers.mdl");
+		PrecacheModel("models/player/gregrogers/infectedl4d1/male_military/gregrogers.mdl");
+		PrecacheModel("models/player/gregrogers/infectedl4d1/male_patient/gregrogers.mdl");
+	}
+#endif
+
 	BaseClass::Precache();
 }
 
@@ -691,10 +708,7 @@ void CCSPlayer::Spawn()
 	{
 		if (GetTeamNumber() == TEAM_CT)
 		{
-			//if (IsBot())
-			//{
-			//
-			//}
+			// This improves bot to bot collision in narrow door ways. FIXME: We need to disable collision with each bot.
 			this->SetCollisionGroup(COLLISION_GROUP_PUSHAWAY);
 			SetMaxSpeed(300);
 		}
@@ -1117,6 +1131,7 @@ void CCSPlayer::DeathSound( const CTakeDamageInfo &info )
 	}
 #endif
 }
+
 
 //-----------------------------------------------------------------------------
 // Purpose:

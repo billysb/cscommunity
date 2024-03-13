@@ -219,6 +219,9 @@ public:
 	// Also get rid of all world decals.
 	void CleanUpMap();
 
+#ifdef TERROR
+	void CCSGameRules::CheckZombieWaveTime();
+#endif
 	void CheckFreezePeriodExpired();
 	void CheckRoundTimeExpired();
 
@@ -332,6 +335,10 @@ public:
 	// GAME TIMES
 	int m_iFreezeTime;		// (From mp_freezetime) - How many seconds long the intro round (when players are frozen) is.
 	float m_flRestartRoundTime;	// the global time when the round is supposed to end, if this is not 0
+#ifdef TERROR
+	float m_fZombieWaveTimeMax; // Max wave respawn time. (When the bomb is planted this will get reduced heavily)
+	float m_fZombieWaveTime; // How long to wait in seconds before respawning a wave of zombies. 
+#endif
 
 	int m_iNumTerrorist;		// The number of terrorists on the team (this is generated at the end of a round)
 	int m_iNumCT;				// The number of CTs on the team (this is generated at the end of a round)

@@ -67,10 +67,16 @@ void OpenDoorState::OnUpdate( CCSBot *me )
 		pos = m_funcDoor->WorldSpaceCenter();
 		isDoorMoving = m_funcDoor->m_toggle_state == TS_GOING_UP || m_funcDoor->m_toggle_state == TS_GOING_DOWN;
 	}
-	else
+	else if ( m_propDoor)
 	{
 		pos = m_propDoor->WorldSpaceCenter();
 		isDoorMoving = m_propDoor->IsDoorOpening() || m_propDoor->IsDoorClosing();
+	}
+	else
+	{
+		// Not good! This means the door is null. Lie to the bot for now to avoid Access violations.. -BillySB
+		m_isDone = true;
+		return;
 	}
 
 	me->SetLookAt( "Open door", pos, PRIORITY_HIGH );

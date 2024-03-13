@@ -801,14 +801,9 @@ bool CCSBot::IsRogue( void ) const
  */
 bool CCSBot::IsHurrying( void ) const
 {
-#ifdef TERROR
-	// Bots shouldn't sneak in terror strike.
-	if (!m_hurryTimer.IsElapsed() || CSGameRules()->IsTerrorStrikeMap())
-		return true;
-#else
+
 	if (!m_hurryTimer.IsElapsed())
 		return true;
-#endif
 
 	CCSBotManager *ctrl = static_cast<CCSBotManager *>( TheCSBots() );
 
@@ -1139,7 +1134,12 @@ void CCSBot::BuildUserCmd( CUserCmd& cmd, const QAngle& viewangles, float forwar
 	if ( !RunMimicCommand( cmd ) )
 	{
 		// Don't walk when ducked - it's painfully slow
-		if ( m_Local.m_bDucked || m_Local.m_bDucking )
+#ifdef TERROR
+		// Walking is not helpful in terror strike as a bot.
+		if (m_Local.m_bDucked || m_Local.m_bDucking || CSGameRules()->IsTerrorStrikeMap())
+#else
+		if (m_Local.m_bDucked || m_Local.m_bDucking)
+#endif
 		{
 			buttons &= ~IN_SPEED;
 		}

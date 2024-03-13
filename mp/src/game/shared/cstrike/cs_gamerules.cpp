@@ -172,7 +172,10 @@ ConVar terrorstrike_infiniteammo("terror_infiniteammo", "1", FCVAR_NOTIFY, "Give
 ConVar terrorstrike_maxzombies("terror_maxzombies", "28", FCVAR_REPLICATED, "Max number of zombies. If you have enough bot profiles to cover it. 28 by default leaving 4 player slots open."); //
 ConVar terrorstrike_usemodels("terror_usemodels", "1", FCVAR_REPLICATED, "Should zombies use the zombie models? this is a bool 1 or 0"); //
 ConVar terrorstrike_preventteam("terror_disable_join_ct", "1", FCVAR_REPLICATED, "This prevents humans from joining the bot team."); //
-ConVar terrorstrike_zombiedmg("terror_zombiedmg", "8", FCVAR_NOTIFY, "This value is used to divide the zombie knife damage.");
+ConVar terrorstrike_zombiedmg("terror_zombiedmg", "32", FCVAR_NOTIFY, "This value is used to divide the zombie knife damage."); // 8 -> 32 (attempt at balancing)
+
+// wave respawning. this gets ignored once the bomb is planted.
+ConVar terrorstrike_maxwavetime("terror_maxwavetime", "15", FCVAR_REPLICATED, "Maximum amount of time between zombie waves.");
 #endif
 
 //ConVar mp_dynamicpricing( "mp_dynamicpricing", "0", FCVAR_REPLICATED, "Enables or Disables the dynamic weapon prices" );
@@ -550,6 +553,11 @@ ConVar cl_autohelp(
 		m_iRoundTime = 0;
 		m_iRoundWinStatus = WINNER_NONE;
 		m_iFreezeTime = 0;
+#ifdef TERROR
+		if (m_fZombieWaveTimeMax == NULL)
+			m_fZombieWaveTimeMax = terrorstrike_maxwavetime.GetFloat();
+		m_fZombieWaveTime = 30;
+#endif
 
 		m_fRoundStartTime = 0;
 		m_bAllowWeaponSwitch = true;
@@ -1059,7 +1067,7 @@ ConVar cl_autohelp(
 	{
 #if TERROR
 		// Don't spam killfeed. Will help with lots of bots.
-		if (IsTerrorStrikeMap())
+		if (m_bIsTerrorStrike && pVictim->GetTeamNumber() == TEAM_CT)
 			return;
 #endif
 		// Work out what killed the player, and send a message to all clients about it
@@ -1824,7 +1832,7 @@ ConVar cl_autohelp(
 		
 			// Terrorists WON
 #ifdef TERROR
-			if (!IsTerrorStrikeMap())
+			if (!m_bIsTerrorStrike)
 			{
 #endif
 				if (NumAliveCT == 0 && NumDeadCT != 0 && m_iNumSpawnableTerrorist > 0)
@@ -2107,7 +2115,11 @@ ConVar cl_autohelp(
 			m_bTCantBuy = false; 
 		}
 		
-		
+#ifdef TERROR
+		// Don't let zombies buy anything.
+		if (m_bIsTerrorStrike)
+			m_bCTCantBuy = true;
+#endif
 		// Check to see if this map has a bomb target in it
 
 		if ( gEntList.FindEntityByClassname( NULL, "func_bomb_target" ) )
@@ -2300,7 +2312,25 @@ ConVar cl_autohelp(
 
 			if ( pPlayer->GetTeamNumber() == TEAM_CT && pPlayer->PlayerClass() >= FIRST_CT_CLASS && pPlayer->PlayerClass() <= LAST_CT_CLASS )
 			{
+#ifdef TERROR
+				// Zombie wave time handles this.
+				if (!m_bIsTerrorStrike)
+				{
+					pPlayer->RoundRespawn();
+				}
+				else
+				{
+					// We need to make sure we are dead for the wave spawner.
+					CTakeDamageInfo dmg;
+					dmg.SetAttacker(pPlayer); // same here.
+					dmg.SetInflictor(pPlayer); // Set killer for the bots.
+					dmg.AddDamage(1000);
+
+					pPlayer->TakeDamage(dmg);
+				}
+#else
 				pPlayer->RoundRespawn();
+#endif
 			}
 			if ( pPlayer->GetTeamNumber() == TEAM_TERRORIST && pPlayer->PlayerClass() >= FIRST_T_CLASS && pPlayer->PlayerClass() <= LAST_T_CLASS )
 			{
@@ -2337,6 +2367,12 @@ ConVar cl_autohelp(
 				pPlayer->CheckTKPunishment();
 			}
 		}
+
+#ifdef TERROR
+		// Give survivors lots of time to buy guns.
+		if (m_bIsTerrorStrike)
+			m_fZombieWaveTime = gpGlobals->curtime + 18;
+#endif
 
 		// Give C4 to the terrorists
 		if (m_bMapHasBombTarget == true	)
@@ -2554,45 +2590,10 @@ ConVar cl_autohelp(
 
 
 #ifdef TERROR
-		if (IsTerrorStrikeMap())
+		
+		if (m_bIsTerrorStrike)
 		{
-			// Time to see if I can get away with this bullshit
-			for (int i = 1; i <= gpGlobals->maxClients; ++i)
-			{
-				CBasePlayer *player = UTIL_PlayerByIndex(i);
-				if (player == NULL)
-					continue;
-
-				if (player->IsDead() && player->GetTeamNumber() == TEAM_CT)
-				{
-					// THIS IS MAGIC CODE! TOUCH THIS AND YOU FUCK UP TERROR STRIKE BOT RESPAWNING -BillySB
-					CCSPlayer *csplayer = ToCSPlayer(player);
-
-					//player->EntSelectSpawnPoint();
-
-					//player->InitialSpawn();
-					player->SharedSpawn();
-					csplayer->RoundRespawn();
-
-					//player->pl.deadflag = false;
-					//player->RemoveSolidFlags(FSOLID_NOT_SOLID);
-					//player->RemoveEffects(EF_NODRAW);
-					//player->m_nRenderFX = kRenderNormal;
-					//player->AddFlag(FL_ONGROUND);
-
-					// Change speed.
-					///csplayer->SetMaxSpeed(800.0f);
-					//csplayer->m_flGroundSpeed = 800.0f;
-					//csplayer->m_flStamina = 99999.0f;
-					//csplayer->m_flSpeed = 800.0f;
-					csplayer->SetHealth(csplayer->GetMaxHealth() / 2.5);
-				}
-				//else if (!player->IsDead() && player->GetTeamNumber() == TEAM_TERRORIST)
-				//{
-				//	CCSPlayer *csplayer = ToCSPlayer(player);
-				//	csplayer->Ammo
-				//}
-			}
+			CheckZombieWaveTime();
 		}
 #endif
 	}
@@ -2691,6 +2692,61 @@ ConVar cl_autohelp(
 		return false;
 	}
 
+	void CCSGameRules::CheckZombieWaveTime()
+	{
+		if (gpGlobals->curtime < m_fZombieWaveTime)
+			return;
+
+		// Time to see if I can get away with this bullshit
+		for (int i = 1; i <= gpGlobals->maxClients; ++i)
+		{
+			CBasePlayer *player = UTIL_PlayerByIndex(i);
+			if (player == NULL)
+				continue;
+
+			if (player->IsDead() && player->GetTeamNumber() == TEAM_CT)
+			{
+				// Only respawn zombies. -BillySB
+				CCSPlayer *csplayer = ToCSPlayer(player);
+				//CBaseEntity* ent = NULL;
+				
+				csplayer->Reset();
+				csplayer->AddSolidFlags(FSOLID_NOT_SOLID);
+
+				GetPlayerSpawnSpot(csplayer);
+
+				/*
+				while ((ent = gEntList.FindEntityByClassname(ent, "info_player_counterterrorist")) != NULL)
+				{
+					if (IsSpawnPointValid(ent, NULL))
+					{
+					}
+				}*/
+
+				player->SharedSpawn();
+				csplayer->RoundRespawn();
+
+				// Hopefully fix zombies spawning with no knives.
+				if (csplayer->WeaponCount() <= 0)
+					csplayer->GiveNamedItem("weapon_knife");
+
+				csplayer->SetHealth(csplayer->GetMaxHealth() / 2.5);
+			}
+		}
+
+		if (m_bBombPlanted)
+		{
+			m_fZombieWaveTime = gpGlobals->curtime + 8;
+		}
+		else
+		{
+			m_fZombieWaveTime = gpGlobals->curtime + terrorstrike_maxwavetime.GetFloat();
+		}
+
+		// debug stuff
+		Msg("Zombie wave time expired. Resetting\n");
+
+	}
 
 	void CCSGameRules::CheckFreezePeriodExpired()
 	{
@@ -2793,7 +2849,7 @@ ConVar cl_autohelp(
 	void CCSGameRules::CheckRoundTimeExpired()
 	{
 #if TERROR
-		if (IsTerrorStrikeMap() || GetRoundRemainingTime() > 0 || m_iRoundWinStatus != WINNER_NONE)
+		if (m_bIsTerrorStrike || GetRoundRemainingTime() > 0 || m_iRoundWinStatus != WINNER_NONE)
 			return; //We haven't completed other objectives, so go for this!.
 #else
 		if (GetRoundRemainingTime() > 0 || m_iRoundWinStatus != WINNER_NONE)
@@ -3122,7 +3178,7 @@ ConVar cl_autohelp(
 
 #if TERROR
 		// Keep humans as survivors.
-		if (IsTerrorStrikeMap())
+		if (m_bIsTerrorStrike)
 			targetTeam = TEAM_TERRORIST;
 #endif
 
@@ -3137,7 +3193,7 @@ ConVar cl_autohelp(
 	{
 #if TERROR
 		// Don't try to do autobalance on a gamemode designed to be unbalanced lol
-		if (IsTerrorStrikeMap())
+		if (m_bIsTerrorStrike)
 			return;
 #endif
 		int iTeamToSwap = TEAM_UNASSIGNED;
@@ -3265,7 +3321,7 @@ ConVar cl_autohelp(
 		CheckLevelInitialized();
 
 #ifdef TERROR
-		if (IsTerrorStrikeMap())
+		if (m_bIsTerrorStrike)
 			return false;
 #endif
 
@@ -3284,7 +3340,7 @@ ConVar cl_autohelp(
 	int CCSGameRules::GetHumanTeam()
 	{
 #ifdef TERROR
-		if (IsTerrorStrikeMap() && terrorstrike_preventteam.GetBool())
+		if (m_bIsTerrorStrike && terrorstrike_preventteam.GetBool())
 			return TEAM_TERRORIST;
 #endif
 		if ( FStrEq( "CT", mp_humanteam.GetString() ) )
@@ -3303,7 +3359,7 @@ ConVar cl_autohelp(
 	{
 #ifdef TERROR
 		// Default team is survivors.
-		if (IsTerrorStrikeMap() && terrorstrike_preventteam.GetBool())
+		if (m_bIsTerrorStrike && terrorstrike_preventteam.GetBool())
 		{
 			return TEAM_TERRORIST;
 		}
@@ -3387,7 +3443,7 @@ ConVar cl_autohelp(
 
 #ifdef TERROR
 		// If team stacking is disabled dont check.
-		if (IsTerrorStrikeMap() || mp_limitteams.GetInt() == 0)
+		if (m_bIsTerrorStrike || mp_limitteams.GetInt() == 0)
 			return false;
 #else
 		// if mp_limitteams is 0, don't check
@@ -3586,11 +3642,12 @@ ConVar cl_autohelp(
 		}
 
 #ifdef TERROR
-		if (CSGameRules()->IsTerrorStrikeMap() && iWinnerTeam == TEAM_CT)
+		// This is a dirty hack instead of adding this properly.
+		if (m_bIsTerrorStrike && iWinnerTeam == TEAM_CT)
 		{
 			text = "#Round_ZombiesWin";
 		}
-		else if (CSGameRules()->IsTerrorStrikeMap() && iWinnerTeam == TEAM_TERRORIST)
+		else if (m_bIsTerrorStrike && iWinnerTeam == TEAM_TERRORIST)
 		{
 			text = "#Round_HumansWin";
 		}
@@ -3715,28 +3772,28 @@ ConVar cl_autohelp(
 		size_t prefixLength = strlen(prefix);
 		size_t mapnameLength = strlen(mapname);
 
-		if (mapnameLength > prefixLength)
+		if (mapnameLength >= prefixLength && strncmp(mapname, prefix, prefixLength) == 0)
 		{
 			// Check if terror strike map.
-			if (strncmp(mapname, prefix, prefixLength) == 0)
-			{
-				Msg("This map is a terror strike map. This will change game behaviour. If you do not want this dont start the map name with zombie_!!!\r\n");
-				m_bIsTerrorStrike = true;
+			Msg("This map is a terror strike map. This will change game behaviour. If you do not want this dont start the map name with zombie_!!!\r\n");
+			m_bIsTerrorStrike = true;
 
-				//cv_bot_quota_mode
-				cv_bot_quota.SetValue(terrorstrike_maxzombies.GetInt()); // We need more bot profiles to go above 21.
-				cv_bot_allow_rogues.SetValue(1); // Fucking hard enough with this off.
-				engine->ServerCommand("mp_flashlight 1\n");
-				engine->ServerExecute();
-			}
-			else
-			{
-				Msg("This map is not a terror strike map. Disabled.");
+			// Rig the bot quota because users might set it to 0 when starting a listen server.
 
-				m_bIsTerrorStrike = false;
-			}
-			Msg("Map: ", mapname, "\r\n");
+			cv_bot_quota.SetValue(terrorstrike_maxzombies.GetInt()); // Limited by bot profiles.
+			cv_bot_allow_rogues.SetValue(1); // Fucking hard enough with this on.
+			engine->ServerCommand("mp_flashlight 1\n");
+			engine->ServerExecute();
+
 		}
+		else
+		{
+			// Too short to be the same.
+			m_bIsTerrorStrike = false;
+			Msg("Terror is disabled.\r\n");
+		}
+
+		Msg("Map: ", mapname, "\r\n");
 #endif
 	}
 
@@ -4338,7 +4395,8 @@ const char *CCSGameRules::GetChatPrefix( bool bTeamOnly, CBasePlayer *pPlayer )
 				if (pPlayer->m_lifeState == LIFE_ALIVE)
 				{
 #ifdef TERROR
-					if (IsTerrorStrikeMap())
+					// FIXME: Does not work because of language files being used instead.
+					if (m_bIsTerrorStrike)
 						pszPrefix = "(Zombie)";
 					else
 						pszPrefix = "(Counter-Terrorist)";
@@ -4349,7 +4407,8 @@ const char *CCSGameRules::GetChatPrefix( bool bTeamOnly, CBasePlayer *pPlayer )
 				else
 				{
 #ifdef TERROR
-					if (IsTerrorStrikeMap())
+					// FIXME: Does not work because of language files being used instead.
+					if (m_bIsTerrorStrike)
 						pszPrefix = "*DEAD*(Zombie)";
 					else
 						pszPrefix = "*DEAD*(Counter-Terrorist)";
@@ -4363,7 +4422,8 @@ const char *CCSGameRules::GetChatPrefix( bool bTeamOnly, CBasePlayer *pPlayer )
 				if (pPlayer->m_lifeState == LIFE_ALIVE)
 				{
 #ifdef TERROR
-					if (IsTerrorStrikeMap())
+					// FIXME: Does not work because of language files being used instead.
+					if (m_bIsTerrorStrike)
 						pszPrefix = "(Survivor)";
 					else
 						pszPrefix = "(Terrorist)";
@@ -4374,7 +4434,8 @@ const char *CCSGameRules::GetChatPrefix( bool bTeamOnly, CBasePlayer *pPlayer )
 				else
 				{
 #ifdef TERROR
-					if (IsTerrorStrikeMap())
+					// FIXME: Does not work because of language files being used instead.
+					if (m_bIsTerrorStrike)
 						pszPrefix = "*DEAD*(Survivor)";
 					else
 						pszPrefix = "*DEAD*(Terrorist)";
@@ -4576,7 +4637,8 @@ bool CCSGameRules::FAllowNPCs( void )
 bool CCSGameRules::IsFriendlyFireOn( void )
 {
 #ifdef TERROR
-	if (IsTerrorStrikeMap())
+	// This seems to get ignored.
+	if (m_bIsTerrorStrike)
 		return true;
 	else
 		return friendlyfire.GetBool();
@@ -4698,7 +4760,7 @@ void CreateBlackMarketString( void )
 int CCSGameRules::GetStartMoney( void )
 {
 #if TERROR
-	if (IsTerrorStrikeMap())
+	if (m_bIsTerrorStrike)
 		return 30000;
 #endif
 	if ( IsBlackMarket() )

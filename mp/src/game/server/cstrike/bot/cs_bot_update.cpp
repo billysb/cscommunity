@@ -951,7 +951,7 @@ void CCSBot::DebugDisplay( void ) const
 	}
 
 	// show behavior variables
-	if (m_isAttacking)
+	if (m_isAttacking &&  GetBotEnemy() != NULL)
 	{
 		NDebugOverlay::ScreenText( 0.5f, 0.4f, msg.sprintf( "ATTACKING: %s", GetBotEnemy()->GetPlayerName() ), 255, 0, 0, 255, duration );
 	}
