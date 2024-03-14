@@ -176,6 +176,10 @@ ConVar terrorstrike_zombiedmg("terror_zombiedmg", "32", FCVAR_NOTIFY, "This valu
 
 // wave respawning. this gets ignored once the bomb is planted.
 ConVar terrorstrike_maxwavetime("terror_maxwavetime", "15", FCVAR_REPLICATED, "Maximum amount of time between zombie waves.");
+
+// Experimental spawning
+ConVar terrorstrike_newspawning("terror_use_experimental_spawns", "1", FCVAR_REPLICATED, "Determines whether to use the new navmesh spawn system. Might have a performance hit it is new. (can be either 1 or 0)");
+ConVar terrorstrike_max_spawn_search("terror_max_spawn_radius", "10", FCVAR_REPLICATED, "This is how many navmesh areas to travel and test for a valid spawn position.");
 #endif
 
 //ConVar mp_dynamicpricing( "mp_dynamicpricing", "0", FCVAR_REPLICATED, "Enables or Disables the dynamic weapon prices" );
@@ -554,6 +558,7 @@ ConVar cl_autohelp(
 		m_iRoundWinStatus = WINNER_NONE;
 		m_iFreezeTime = 0;
 #ifdef TERROR
+		m_bHasFirstWaveStarted = false;
 		if (m_fZombieWaveTimeMax == NULL)
 			m_fZombieWaveTimeMax = terrorstrike_maxwavetime.GetFloat();
 		m_fZombieWaveTime = 30;
@@ -2310,6 +2315,19 @@ ConVar cl_autohelp(
 			if ( !pPlayer )
 				continue;
 
+#ifdef TERROR
+			if (m_bIsTerrorStrike)
+			{
+				// We disable bots ability to reset on spawn. so do it here. a dirty hack.
+				// check cs_bot_init spawn() for ugly solution.
+				if (pPlayer->IsBot())
+				{
+					CCSBot *BotMe = static_cast<CCSBot *>(pPlayer);
+					BotMe->Reset();
+				}
+			}
+#endif
+
 			if ( pPlayer->GetTeamNumber() == TEAM_CT && pPlayer->PlayerClass() >= FIRST_CT_CLASS && pPlayer->PlayerClass() <= LAST_CT_CLASS )
 			{
 #ifdef TERROR
@@ -2370,6 +2388,7 @@ ConVar cl_autohelp(
 
 #ifdef TERROR
 		// Give survivors lots of time to buy guns.
+		m_bHasFirstWaveStarted = false;
 		if (m_bIsTerrorStrike)
 			m_fZombieWaveTime = gpGlobals->curtime + 18;
 #endif
@@ -2697,23 +2716,79 @@ ConVar cl_autohelp(
 		if (gpGlobals->curtime < m_fZombieWaveTime)
 			return;
 
+		int survivor_count = 0;
+		CBasePlayer *survivors[ 65 ];
+
+		// TODO: Efficient way to get survivors.
+		for (int o = 1; o <= gpGlobals->maxClients; ++o)
+		{
+			CBasePlayer *surv = UTIL_PlayerByIndex(o);
+			if (surv != NULL && surv->GetTeamNumber() == TEAM_TERRORIST && !surv->IsDead())
+			{
+				survivors[survivor_count] = surv;
+				survivor_count += 1;
+			}
+		}
+
 		// Time to see if I can get away with this bullshit
 		for (int i = 1; i <= gpGlobals->maxClients; ++i)
 		{
 			CBasePlayer *player = UTIL_PlayerByIndex(i);
 			if (player == NULL)
 				continue;
-
+			
 			if (player->IsDead() && player->GetTeamNumber() == TEAM_CT)
 			{
-				// Only respawn zombies. -BillySB
+				// Only respawn TEAM_CT
 				CCSPlayer *csplayer = ToCSPlayer(player);
-				//CBaseEntity* ent = NULL;
 				
-				csplayer->Reset();
+				// EDIT: DO NOT RESET THE PLAYER! if they are a bot it will fuck them up.
+				//csplayer->Reset();
 				csplayer->AddSolidFlags(FSOLID_NOT_SOLID);
 
-				GetPlayerSpawnSpot(csplayer);
+
+				// 50% chance of using navmesh spawn.
+				if (rand() > (VALVE_RAND_MAX / 2) && m_bHasFirstWaveStarted && terrorstrike_newspawning.GetBool())
+				{
+					// Get a randm survivor
+
+					Vector *NavSpawn = NULL;
+
+					for (int o = 0; o < 65; o++)
+					{
+						// Dont waste our time.
+						if (o > survivor_count)
+							break;
+
+						CBasePlayer *ply = UTIL_PlayerByIndex(i);
+
+						if (ply == NULL)
+							continue;
+						else if (rand() > (VALVE_RAND_MAX / 2))
+						{
+							// 50% chance of picking this survivor
+							NavSpawn = this->GetNavmeshSpawnSpot(ply);
+						}
+					}
+
+					if (NavSpawn)
+					{
+						// Has a spawn location.
+						Msg("Navigation mesh spawn.\n");
+						csplayer->Teleport(NavSpawn, &csplayer->GetAbsAngles(), &vec3_origin);
+						csplayer->m_Local.m_vecPunchAngle = vec3_angle;
+					}
+					else
+					{
+						// Failed to get navmesh use normal spawning.
+						Msg("Failed to get navmesh spawn. spawning normally.\n");
+						GetPlayerSpawnSpot(csplayer);
+					}
+				}
+				else
+				{
+					GetPlayerSpawnSpot(csplayer);
+				}
 
 				/*
 				while ((ent = gEntList.FindEntityByClassname(ent, "info_player_counterterrorist")) != NULL)
@@ -2723,12 +2798,13 @@ ConVar cl_autohelp(
 					}
 				}*/
 
-				player->SharedSpawn();
-				csplayer->RoundRespawn();
-
 				// Hopefully fix zombies spawning with no knives.
 				if (csplayer->WeaponCount() <= 0)
 					csplayer->GiveNamedItem("weapon_knife");
+
+				
+				player->SharedSpawn();
+				csplayer->RoundRespawn();
 
 				csplayer->SetHealth(csplayer->GetMaxHealth() / 2.5);
 			}
@@ -2745,6 +2821,7 @@ ConVar cl_autohelp(
 
 		// debug stuff
 		Msg("Zombie wave time expired. Resetting\n");
+		m_bHasFirstWaveStarted = true;
 
 	}
 
@@ -3778,10 +3855,15 @@ ConVar cl_autohelp(
 			Msg("This map is a terror strike map. This will change game behaviour. If you do not want this dont start the map name with zombie_!!!\r\n");
 			m_bIsTerrorStrike = true;
 
+			//UTIL_ShowMessage();
+
 			// Rig the bot quota because users might set it to 0 when starting a listen server.
 
+			//gpGlobals->maxClients = MAX_PLAYERS;
+			//gpGlobals->deathmatch = true; // Test hack
+
 			cv_bot_quota.SetValue(terrorstrike_maxzombies.GetInt()); // Limited by bot profiles.
-			cv_bot_allow_rogues.SetValue(1); // Fucking hard enough with this on.
+			cv_bot_allow_rogues.SetValue(0); // Fucking hard enough with this on.
 			engine->ServerCommand("mp_flashlight 1\n");
 			engine->ServerExecute();
 
@@ -3969,6 +4051,133 @@ ConVar cl_autohelp(
 		return pSpawnSpot;
 	}
 	
+#ifdef TERROR
+	bool CCSGameRules::IsNavVisibleBySurvivors(CNavArea *Target)
+	{
+		for (int o = 1; o <= gpGlobals->maxClients; ++o)
+		{
+			CBasePlayer *surv = UTIL_PlayerByIndex(o);
+			if (surv != NULL && surv->GetTeamNumber() == TEAM_TERRORIST && !surv->IsDead())
+			{
+				CNavArea *SurvArea = TheNavMesh->GetNavArea(surv->GetAbsOrigin());
+
+				// uh oh stinky.
+				if (SurvArea == NULL)
+					continue;
+
+				if (Target->IsPotentiallyVisible(SurvArea))
+					return true;
+				else
+					continue;
+			}
+		}
+
+		// probably safe.
+		return false;
+	}
+	// TODO: Make sure we take into account other players that might see our spawn area.
+	Vector *CCSGameRules::GetNavmeshSpawnSpot(CBasePlayer *pTarget)
+	{
+		// Cannot do this if no mesh is loaded.
+		if (!TheNavMesh->IsLoaded())
+			return NULL;
+
+		CNavArea *TargetArea = TheNavMesh->GetNavArea(pTarget->GetAbsOrigin());
+
+		// Failed to grab player's area.
+		if (TargetArea == NULL)
+			return NULL;
+
+		Vector *Output = NULL;
+
+		// Okay now go through area connections until we find one that the player cannot see.
+		bool HasFoundArea = false;
+		int loop_count = 1;
+
+		const int MAX_AREAS_TO_TEST = 100;
+		CNavArea *AreasToTest[MAX_AREAS_TO_TEST];
+		int numAreasToTest = 0;
+
+		// Add TargetArea to AreasToTest
+		AreasToTest[numAreasToTest++] = TargetArea;
+
+		int maxsearch = terrorstrike_max_spawn_search.GetInt();
+
+		while (!HasFoundArea)
+		{
+			// Don't freeze the game.
+			if (loop_count > 100)
+				break;
+
+			// ran out of meshes to try.
+			if (numAreasToTest == 0)
+				break;
+
+			CNavArea *CurrentAreaToTest = AreasToTest[--numAreasToTest];
+
+			for (int d = 0; d < NUM_DIRECTIONS; d++)
+			{
+				const NavConnectVector *connectList = CurrentAreaToTest->GetAdjacentAreas((NavDirType)d);
+
+				FOR_EACH_VEC((*connectList), it)
+				{
+					NavConnect connect = (*connectList)[it];
+					if (loop_count < maxsearch)
+					{
+						if (numAreasToTest < MAX_AREAS_TO_TEST)
+						{
+							// Add connect.area to AreasToTest
+							AreasToTest[numAreasToTest++] = connect.area;
+						}
+					}
+					else
+					{
+						// Now start testing for potential spawns.
+						if (!IsNavVisibleBySurvivors(connect.area))
+						{
+							// Hurray we have a spawn! Now figure out a valid position in 3D space.....
+
+							// Get a random point on the nav mesh. We should try this a few times.
+							int attempts = 0;
+
+							while (attempts < 5)
+							{
+								Vector RandomSpawn = connect.area->GetRandomPoint();
+
+								Vector mins = GetViewVectors()->m_vHullMin;
+								Vector maxs = GetViewVectors()->m_vHullMax;
+
+								Vector vTestMins = RandomSpawn + mins;
+								Vector vTestMaxs = RandomSpawn + maxs;
+
+								// using out target to check space is empty seems bad.
+								if (UTIL_IsSpaceEmpty(pTarget, mins, maxs))
+								{
+									Output = new Vector(RandomSpawn.x, RandomSpawn.y, RandomSpawn.z);
+									HasFoundArea = true;
+									break;
+								}
+
+								attempts += 1;
+							}
+						}
+					}
+				}
+			}
+
+			loop_count += 1;
+		}
+
+		Msg("Found a suitable spawn after ", loop_count, " attempts..\n");
+
+
+		if (!HasFoundArea)
+			return NULL;
+		else
+			return Output;
+	}
+#endif
+
 	// checks if the spot is clear of players
 	bool CCSGameRules::IsSpawnPointValid( CBaseEntity *pSpot, CBasePlayer *pPlayer )
 	{

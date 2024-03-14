@@ -111,6 +111,10 @@ public:
 	bool IsHostageRescueMap() const;
 	bool IsIntermission() const;
 	bool IsLogoMap() const;
+#ifdef TERROR
+	bool CCSGameRules::IsNavVisibleBySurvivors(CNavArea *Target);
+	Vector *CCSGameRules::GetNavmeshSpawnSpot(CBasePlayer *pTarget);
+#endif
 	bool IsSpawnPointValid( CBaseEntity *pSpot, CBasePlayer *pPlayer );
 
 	bool IsBuyTimeElapsed();
@@ -338,6 +342,7 @@ public:
 #ifdef TERROR
 	float m_fZombieWaveTimeMax; // Max wave respawn time. (When the bomb is planted this will get reduced heavily)
 	float m_fZombieWaveTime; // How long to wait in seconds before respawning a wave of zombies. 
+	bool m_bHasFirstWaveStarted;
 #endif
 
 	int m_iNumTerrorist;		// The number of terrorists on the team (this is generated at the end of a round)

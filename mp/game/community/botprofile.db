@@ -191,6 +191,58 @@ End
 // Default and then the specified Template(s), in order
 //
 
+Elite Brian
+	VoicePitch = 118
+End
+
+Elite Stefan
+	VoicePitch = 94
+End
+
+Elite Reece
+	VoicePitch = 78
+End
+
+Elite Ryan
+	VoicePitch = 118
+End
+
+Elite Andrew
+	VoicePitch = 111
+End
+
+Elite Sam
+	VoicePitch = 103
+End
+
+Elite Callum
+	VoicePitch = 95
+End
+
+Elite Colton
+	VoicePitch = 87
+End
+
+Elite Ronald
+	VoicePitch = 93
+End
+
+Elite Robert
+	VoicePitch = 93
+End
+
+Elite Linus
+	VoicePitch = 115
+End
+
+Elite Lester
+	VoicePitch = 112
+End
+
+Elite Fester
+	VoicePitch = 89
+End
+
 Elite Colby
 	VoicePitch = 80
 End
@@ -295,6 +347,58 @@ End
 
 //----------------------------------------
 
+Expert Brian
+	VoicePitch = 118
+End
+
+Expert Stefan
+	VoicePitch = 94
+End
+
+Expert Reece
+	VoicePitch = 78
+End
+
+Expert Ryan
+	VoicePitch = 118
+End
+
+Expert Andrew
+	VoicePitch = 111
+End
+
+Expert Sam
+	VoicePitch = 103
+End
+
+Expert Callum
+	VoicePitch = 95
+End
+
+Expert Colton
+	VoicePitch = 87
+End
+
+Expert Ronald
+	VoicePitch = 93
+End
+
+Expert Robert
+	VoicePitch = 93
+End
+
+Expert Linus
+	VoicePitch = 115
+End
+
+Expert Lester
+	VoicePitch = 112
+End
+
+Expert Fester
+	VoicePitch = 89
+End
+
 Expert Colby
 	VoicePitch = 80
 End
@@ -384,6 +488,58 @@ End
 
 //----------------------------------------
 
+VeryHard Brian
+	VoicePitch = 118
+End
+
+VeryHard Stefan
+	VoicePitch = 94
+End
+
+VeryHard Reece
+	VoicePitch = 78
+End
+
+VeryHard Ryan
+	VoicePitch = 118
+End
+
+VeryHard Andrew
+	VoicePitch = 111
+End
+
+VeryHard Sam
+	VoicePitch = 103
+End
+
+VeryHard Callum
+	VoicePitch = 95
+End
+
+VeryHard Colton
+	VoicePitch = 87
+End
+
+VeryHard Ronald
+	VoicePitch = 93
+End
+
+VeryHard Robert
+	VoicePitch = 93
+End
+
+VeryHard Linus
+	VoicePitch = 115
+End
+
+VeryHard Lester
+	VoicePitch = 112
+End
+
+VeryHard Fester
+	VoicePitch = 89
+End
+
 VeryHard Colby
 	VoicePitch = 80
 End
@@ -452,6 +608,58 @@ End
 
 
 //----------------------------------------
+
+Hard Brian
+	VoicePitch = 118
+End
+
+Hard Stefan
+	VoicePitch = 94
+End
+
+Hard Reece
+	VoicePitch = 78
+End
+
+Hard Ryan
+	VoicePitch = 118
+End
+
+Hard Andrew
+	VoicePitch = 111
+End
+
+Hard Sam
+	VoicePitch = 103
+End
+
+Hard Callum
+	VoicePitch = 95
+End
+
+Hard Colton
+	VoicePitch = 87
+End
+
+Hard Ronald
+	VoicePitch = 93
+End
+
+Hard Robert
+	VoicePitch = 93
+End
+
+Hard Linus
+	VoicePitch = 115
+End
+
+Hard Lester
+	VoicePitch = 112
+End
+
+Hard Fester
+	VoicePitch = 89
+End
 
 Hard Colby
 	VoicePitch = 80
@@ -571,6 +779,58 @@ Hard+Rifle Zim
 End
 
 //----------------------------------------
+
+Tough Brian
+	VoicePitch = 118
+End
+
+Tough Stefan
+	VoicePitch = 94
+End
+
+Tough Reece
+	VoicePitch = 78
+End
+
+Tough Ryan
+	VoicePitch = 118
+End
+
+Tough Andrew
+	VoicePitch = 111
+End
+
+Tough Sam
+	VoicePitch = 103
+End
+
+Tough Callum
+	VoicePitch = 95
+End
+
+Tough Colton
+	VoicePitch = 87
+End
+
+Tough Ronald
+	VoicePitch = 93
+End
+
+Tough Robert
+	VoicePitch = 93
+End
+
+Tough Linus
+	VoicePitch = 115
+End
+
+Tough Lester
+	VoicePitch = 112
+End
+
+Tough Fester
+	VoicePitch = 89
+End
 
 Tough Colby
 	VoicePitch = 80
@@ -719,6 +979,58 @@ Tough+Rifle Xavier
 End
 
 //----------------------------------------
+
+Normal Brian
+	VoicePitch = 118
+End
+
+Normal Stefan
+	VoicePitch = 94
+End
+
+Normal Reece
+	VoicePitch = 78
+End
+
+Normal Ryan
+	VoicePitch = 118
+End
+
+Normal Andrew
+	VoicePitch = 111
+End
+
+Normal Sam
+	VoicePitch = 103
+End
+
+Normal Callum
+	VoicePitch = 95
+End
+
+Normal Colton
+	VoicePitch = 87
+End
+
+Normal Ronald
+	VoicePitch = 93
+End
+
+Normal Robert
+	VoicePitch = 93
+End
+
+Normal Linus
+	VoicePitch = 115
+End
+
+Normal Lester
+	VoicePitch = 112
+End
+
+Normal Fester
+	VoicePitch = 89
+End
 
 Normal Colby
 	VoicePitch = 80
@@ -883,6 +1195,58 @@ End
 
 //----------------------------------------
 
+Fair Brian
+	VoicePitch = 118
+End
+
+Fair Stefan
+	VoicePitch = 94
+End
+
+Fair Reece
+	VoicePitch = 78
+End
+
+Fair Ryan
+	VoicePitch = 118
+End
+
+Fair Andrew
+	VoicePitch = 111
+End
+
+Fair Sam
+	VoicePitch = 103
+End
+
+Fair Callum
+	VoicePitch = 95
+End
+
+Fair Colton
+	VoicePitch = 87
+End
+
+Fair Ronald
+	VoicePitch = 93
+End
+
+Fair Robert
+	VoicePitch = 93
+End
+
+Fair Linus
+	VoicePitch = 115
+End
+
+Fair Lester
+	VoicePitch = 112
+End
+
+Fair Fester
+	VoicePitch = 89
+End
+
 Fair Colby
 	VoicePitch = 80
 End
@@ -1022,6 +1386,58 @@ Fair Wyatt
 End
 
 //----------------------------------------
+
+Easy Brian
+	VoicePitch = 118
+End
+
+Easy Stefan
+	VoicePitch = 94
+End
+
+Easy Reece
+	VoicePitch = 78
+End
+
+Easy Ryan
+	VoicePitch = 118
+End
+
+Easy Andrew
+	VoicePitch = 111
+End
+
+Easy Sam
+	VoicePitch = 103
+End
+
+Easy Callum
+	VoicePitch = 95
+End
+
+Easy Colton
+	VoicePitch = 87
+End
+
+Easy Ronald
+	VoicePitch = 93
+End
+
+Easy Robert
+	VoicePitch = 93
+End
+
+Easy Linus
+	VoicePitch = 115
+End
+
+Easy Lester
+	VoicePitch = 112
+End
+
+Easy Fester
+	VoicePitch = 89
+End
 
 Easy Colby
 	VoicePitch = 80

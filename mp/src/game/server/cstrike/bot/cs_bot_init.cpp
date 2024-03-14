@@ -349,12 +349,22 @@ void CCSBot::ResetValues( void )
  * Called when bot is placed in map, and when bots are reset after a round ends.
  * NOTE: For some reason, this can be called twice when a bot is added.
  */
-void CCSBot::Spawn( void )
+void CCSBot::Spawn(void)
 {
 	// do the normal player spawn process
 	BaseClass::Spawn();
 
+#ifdef TERROR
+	CCSBotManager *ctrl = static_cast<CCSBotManager *>(TheBots);
+	// Dirty hack because this breaks us on terror strike when we respawn.
+
+	if (!ctrl->IsTerrorStrike())
+	{
+		ResetValues();
+	}
+#else
 	ResetValues();
+#endif
 
 	strcpy( m_name, GetPlayerName() );
 

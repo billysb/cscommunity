@@ -746,7 +746,6 @@
 
 	"rndwave"
 	{
-		"wave"	"bots/terror/alert.wav"
 		"wave"	"bots/terror/infected/alert/alert/alert13.wav"
 		"wave"	"bots/terror/infected/alert/alert/alert16.wav"
 		"wave"	"bots/terror/infected/alert/alert/alert22.wav"
@@ -794,6 +793,47 @@
 		"wave"	"bots/terror/infected/alert/becomeEnraged/male/become_enraged42.wav"
 		"wave"	"bots/terror/infected/alert/becomeEnraged/male/become_enraged43.wav"
 	}
+}
+
+"Zombie.DeathHeadShot"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"CompatibilityAttenuation"	"1.0"
+
+	"rndwave"
+	{
+		"wave"	"bots/terror/infected/action/die/death_14.wav"
+		"wave"	"bots/terror/infected/action/die/death_18.wav"
+		"wave"	"bots/terror/infected/action/die/death_19.wav"
+		"wave"	"bots/terror/infected/action/die/death_22.wav"
+		"wave"	"bots/terror/infected/action/die/death_23.wav"
+		"wave"	"bots/terror/infected/action/die/death_24.wav"
+		"wave"	"bots/terror/infected/action/die/death_25.wav"
+		"wave"	"bots/terror/infected/action/die/death_26.wav"
+		"wave"	"bots/terror/infected/action/die/death_27.wav"
+		"wave"	"bots/terror/infected/action/die/death_28.wav"
+		"wave"	"bots/terror/infected/action/die/death_29.wav"
+		"wave"	"bots/terror/infected/action/die/death_30.wav"
+		"wave"	"bots/terror/infected/action/die/death_32.wav"
+		"wave"	"bots/terror/infected/action/die/death_33.wav"
+		"wave"	"bots/terror/infected/action/die/death_34.wav"
+		"wave"	"bots/terror/infected/action/die/death_35.wav"
+		"wave"	"bots/terror/infected/action/die/death_36.wav"
+		"wave"	"bots/terror/infected/action/die/death_37.wav"
+		"wave"	"bots/terror/infected/action/die/death_38.wav"
+		"wave"	"bots/terror/infected/action/die/male/death_40.wav"
+		"wave"	"bots/terror/infected/action/die/male/death_41.wav"
+		"wave"	"bots/terror/infected/action/die/male/death_42.wav"
+		"wave"	"bots/terror/infected/action/die/male/death_43.wav"
+		"wave"	"bots/terror/infected/action/die/male/death_44.wav"
+		"wave"	"bots/terror/infected/action/die/male/death_45.wav"
+		"wave"	"bots/terror/infected/action/die/male/death_46.wav"
+		"wave"	"bots/terror/infected/action/die/male/death_47.wav"
+		"wave"	"bots/terror/infected/action/die/male/death_48.wav"
+		"wave"	"bots/terror/infected/action/die/male/death_49.wav"
+	}
+	
 }
 
 "Zombie.Death"

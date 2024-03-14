@@ -764,10 +764,12 @@ void CCSPlayer::Spawn()
 	m_iRadioMessages = 60;
 	m_flRadioTime = gpGlobals->curtime;
 
+
 	if ( m_hRagdoll )
 	{
 		UTIL_Remove( m_hRagdoll );
 	}
+
 
 	m_hRagdoll = NULL;
 
@@ -831,6 +833,11 @@ void CCSPlayer::Spawn()
 		// Emit a spawn sound because this helps me feel better knowing its working.
 		this->EmitSound("Zombie.Death");
 	}
+	/*else
+	{
+		PrecacheModel("models/player/survivor_teenangst.mdl");
+		SetModel("models/player/survivor_teenangst.mdl");
+	}*/
 #endif
 }
 
@@ -875,8 +882,16 @@ void CCSPlayer::GiveDefaultItems()
 	if ( GetTeamNumber() == TEAM_CT )
 	{
 		GiveNamedItem( "weapon_knife" );
-		GiveNamedItem( "weapon_usp" );
-		GiveAmmo( 24, BULLET_PLAYER_45ACP );
+#ifdef TERROR
+		if (!CSGameRules()->IsTerrorStrikeMap())
+		{
+			GiveNamedItem( "weapon_usp" );
+			GiveAmmo( 24, BULLET_PLAYER_45ACP );
+		}
+#else
+		GiveNamedItem("weapon_usp");
+		GiveAmmo(24, BULLET_PLAYER_45ACP);
+#endif
 	}
 	else if ( GetTeamNumber() == TEAM_TERRORIST )
 	{
