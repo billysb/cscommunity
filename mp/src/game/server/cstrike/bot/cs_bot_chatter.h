@@ -644,6 +644,7 @@ inline void BotChatterInterface::Say( const char *phraseName, float lifetime, fl
 		say->SetStartTime( gpGlobals->curtime + delay );
 
 	AddStatement( say );
+
 }
 
 

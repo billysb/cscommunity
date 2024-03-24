@@ -749,7 +749,7 @@ void CCSBot::Wiggle( void )
 	if (m_wiggleTimer.IsElapsed())
 	{
 		m_wiggleDirection = (NavRelativeDirType)RandomInt( 0, 3 );
-		m_wiggleTimer.Start( RandomFloat( 0.3f, 0.5f ) );		// 0.3, 0.5
+		m_wiggleTimer.Start( RandomFloat( 0.3f, 1.5f ) );		// Original values: 0.3, 0.5
 	}
 
 	Vector forward, right;

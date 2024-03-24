@@ -674,8 +674,7 @@ void CNavArea::OnServerActivate( void )
 	m_damagingTickCount = 0;
 	ClearAllNavCostEntities();
 
-	UnblockArea();
-	m_attributeFlags &= ~NAV_MESH_TRANSIENT;
+	UnblockArea(TEAM_ANY);
 	UpdateBlockedFromNavBlockers();
 }
 
@@ -692,8 +691,7 @@ void CNavArea::OnRoundRestart( void )
 	ClearAllNavCostEntities();
 
 	// Make sure we unblock blocked areas otherwise pathfinding will break. -BillySB
-	UnblockArea();
-	m_attributeFlags &= ~NAV_MESH_TRANSIENT;
+	UnblockArea(TEAM_ANY);
 	UpdateBlockedFromNavBlockers();
 }
 
@@ -4871,7 +4869,8 @@ void CNavArea::UpdateBlocked( bool force, int teamID )
 	// See if spot is valid
 #ifdef TERROR
 	// don't unblock func_doors
-	CTraceFilterWalkableEntities filter( NULL, COLLISION_GROUP_PLAYER_MOVEMENT, WALK_THRU_PROP_DOORS | WALK_THRU_BREAKABLES );
+	//CTraceFilterWalkableEntities filter( NULL, COLLISION_GROUP_PLAYER_MOVEMENT, WALK_THRU_PROP_DOORS | WALK_THRU_BREAKABLES );
+	CTraceFilterWalkableEntities filter( NULL, COLLISION_GROUP_PLAYER_MOVEMENT, WALK_THRU_DOORS | WALK_THRU_BREAKABLES );
 #else
 	CTraceFilterWalkableEntities filter( NULL, COLLISION_GROUP_PLAYER_MOVEMENT, WALK_THRU_DOORS | WALK_THRU_BREAKABLES );
 #endif

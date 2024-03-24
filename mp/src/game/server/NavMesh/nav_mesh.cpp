@@ -614,7 +614,7 @@ void CNavMesh::TestAllAreasForBlockedStatus( void )
 	FOR_EACH_VEC( TheNavAreas, pit )
 	{
 		CNavArea *area = TheNavAreas[ pit ];
-		area->UpdateBlocked( true );
+		area->UpdateBlocked( false );
 	}
 }
 
@@ -631,12 +631,12 @@ void CNavMesh::OnRoundRestart( void )
 	
 	It's a hacky solution but at least its playable. -BillySB
 	*/
-	//m_updateBlockedAreasTimer.Start( 5.0f );
 	FOR_EACH_VEC(TheNavAreas, pit)
 	{
 		CNavArea *area = TheNavAreas[ pit ];
 		area->UnblockArea(TEAM_ANY);
 	}
+	m_updateBlockedAreasTimer.Start(5.0f);
 #ifdef NEXT_BOT
 	FOR_EACH_VEC( TheNavAreas, pit )
 	{
@@ -2779,8 +2779,11 @@ static ConCommand nav_show_ladder_bounds( "nav_show_ladder_bounds", CommandNavSh
 //--------------------------------------------------------------------------------------------------------------
 void CommandNavBuildLadder( void )
 {
-	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+	if (!UTIL_IsCommandIssuedByServerAdmin())
+	{
+		DevMsg("Fuck you said valve\n");
 		return;
+	}
 
 	TheNavMesh->CommandNavBuildLadder();
 }

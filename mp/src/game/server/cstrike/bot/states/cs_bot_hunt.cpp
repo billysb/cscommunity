@@ -82,6 +82,14 @@ void HuntState::OnUpdate( CCSBot *me )
 			if (!me->IsRogue() && me->GetGameState()->IsBombPlanted() && bombPos)
 			{
 				me->SetTask( CCSBot::GUARD_TICKING_BOMB );
+				
+				/*CNavArea *TestArea = TheNavMesh->GetNavArea(*bombPos);
+
+				if (TestArea)
+				{
+					TestArea->
+				}*/
+
 				me->Hide( TheNavMesh->GetNavArea( *bombPos ) );
 				return;
 			}

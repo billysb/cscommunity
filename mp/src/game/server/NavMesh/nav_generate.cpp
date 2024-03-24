@@ -22,6 +22,7 @@
 // FIXME: Make this header file -BillySB
 // #include "func_simpleladder.h"
 #endif
+#include "func_ladder.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -148,17 +149,14 @@ void CNavMesh::BuildLadders( void )
 	// remove any left-over ladders
 	DestroyLadders();
 
-#ifdef TERROR
-//FIXME: Need to implement simple ladders. -BillySB
-	/*
-	CFuncSimpleLadder *ladder = NULL;
-	while( (ladder = dynamic_cast< CFuncSimpleLadder * >(gEntList.FindEntityByClassname( ladder, "func_simpleladder" ))) != NULL )
+	CFuncLadder *ladder = NULL;
+	while ((ladder = (CFuncLadder*)(gEntList.FindEntityByClassname((CBaseEntity*)ladder, "func_ladder"))) != NULL)
 	{
 		Vector mins, maxs;
 		ladder->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
 		CreateLadder( mins, maxs, 0.0f );
-	}*/
-#endif
+	}
+
 }
 
 

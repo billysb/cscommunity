@@ -876,20 +876,49 @@ void CHostage::HostageUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 		return;
 	}
 
+#ifdef TERROR
+	
+	// In Terror Strike zombies cannot move the hostages.
+
+	if (CSGameRules()->IsTerrorStrikeMap() && user->GetTeamNumber() == TEAM_CT)
+	{
+
+		if (!(user->m_iDisplayHistoryBits & DHF_HOSTAGE_CTMOVE))
+		{
+			user->m_iDisplayHistoryBits |= DHF_HOSTAGE_CTMOVE;
+			user->HintMessage("#Only_CT_Can_Move_Hostages", false, true);
+		}
+
+		return;
+	}
+	else if (!CSGameRules()->IsTerrorStrikeMap() && user->GetTeamNumber() == TEAM_TERRORIST)
+	{
+		if ( !(user->m_iDisplayHistoryBits & DHF_HOSTAGE_CTMOVE) )
+		{
+			user->m_iDisplayHistoryBits |= DHF_HOSTAGE_CTMOVE;
+			user->HintMessage("#Only_CT_Can_Move_Hostages", false, true);
+		}
+
+		return;
+	}
+
+#else
 	// only members of the CT team can use hostages (no T's or spectators)
 	if (!hostage_debug.GetBool() && user->GetTeamNumber() != TEAM_CT)
 	{
-		if ( user->GetTeamNumber() == TEAM_TERRORIST )
+		if (user->GetTeamNumber() == TEAM_TERRORIST)
 		{
-			if ( !(user->m_iDisplayHistoryBits & DHF_HOSTAGE_CTMOVE) )
+			if (!(user->m_iDisplayHistoryBits & DHF_HOSTAGE_CTMOVE))
 			{
 				user->m_iDisplayHistoryBits |= DHF_HOSTAGE_CTMOVE;
-				user->HintMessage( "#Only_CT_Can_Move_Hostages", false, true );
+				user->HintMessage("#Only_CT_Can_Move_Hostages", false, true);
 			}
 		}
 
 		return;
 	}
+#endif
+
 
 	CCSPlayer *leader = GetLeader();
 	if( leader && !leader->IsAlive() )
@@ -909,7 +938,12 @@ void CHostage::HostageUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 	{
 		m_hasBeenUsed = true;
 
-		GiveCTUseBonus( user );
+#ifdef TERROR
+		if (!CSGameRules()->IsTerrorStrikeMap())
+			GiveCTUseBonus( user );
+#else
+		GiveCTUseBonus(user);
+#endif
 
 		CSGameRules()->HostageTouched();
 	}
