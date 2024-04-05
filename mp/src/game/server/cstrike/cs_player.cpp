@@ -54,6 +54,14 @@
 #include "cs_gamestats.h"
 #include "gamestats.h"
 
+#ifdef TERROR
+// This is pretty awful, really we should use the CBaseEntity class as much as possible.
+#include "hegrenade_projectile.h"
+#include "smokegrenade_projectile.h"
+#include "gib.h"
+#include "explode.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -83,6 +91,7 @@ extern ConVar terrorstrike_usemodels;
 extern ConVar terrorstrike_deathalerts;
 extern ConVar terrorstrike_infiniteammo;
 extern ConVar terrorstrike_zombiespeed;
+extern ConVar terrorstrike_use_special_infected;
 #endif
 
 #define THROWGRENADE_COUNTER_BITS 3
@@ -414,6 +423,9 @@ CCSPlayer::CCSPlayer()
 	m_cycleLatchTimer.Invalidate();
 
 	m_iShouldHaveCash = 0;
+
+	//m_IsSpecialInfected = false;
+	//m_IsSmoker = false;
 }
 
 
@@ -495,17 +507,28 @@ void CCSPlayer::Precache()
 	PrecacheModel ( "sprites/glow01.vmt" );
 
 #ifdef TERROR
-	// Precache zombie models too if enabled and is terror strike.
-	if (CSGameRules()->IsTerrorStrikeMap() && terrorstrike_usemodels.GetBool())
+	if (CSGameRules()->IsTerrorStrikeMap())
 	{
-		PrecacheModel("models/player/gregrogers/infectedl4d1/male_worker/gregrogers.mdl");
-		PrecacheModel("models/player/gregrogers/infectedl4d1/male_rural/gregrogers.mdl");
-		PrecacheModel("models/player/gregrogers/infectedl4d1/male/gregrogers.mdl");
-		PrecacheModel("models/player/gregrogers/infectedl4d1/female/gregrogers.mdl");
-		PrecacheModel("models/player/gregrogers/infectedl4d1/male_suit/gregrogers.mdl");
-		PrecacheModel("models/player/gregrogers/infectedl4d1/male_police/gregrogers.mdl");
-		PrecacheModel("models/player/gregrogers/infectedl4d1/male_military/gregrogers.mdl");
-		PrecacheModel("models/player/gregrogers/infectedl4d1/male_patient/gregrogers.mdl");
+		// Testing gibbing for the boomer.
+		PrecacheModel("models/player/gibs/t_phoenix_gib1.mdl");
+		PrecacheModel("models/player/gibs/t_phoenix_gib2.mdl");
+		PrecacheModel("models/player/gibs/t_phoenix_gib3.mdl");
+		PrecacheModel("models/player/gibs/t_phoenix_gib4.mdl");
+		PrecacheModel("models/player/gibs/t_phoenix_gib5.mdl");
+		PrecacheModel("models/player/gibs/t_phoenix_gib6.mdl");
+
+		if (terrorstrike_usemodels.GetBool())
+		{
+			// This is for the zombie team..
+			PrecacheModel("models/player/gregrogers/infectedl4d1/male_worker/gregrogers.mdl");
+			PrecacheModel("models/player/gregrogers/infectedl4d1/male_rural/gregrogers.mdl");
+			PrecacheModel("models/player/gregrogers/infectedl4d1/male/gregrogers.mdl");
+			PrecacheModel("models/player/gregrogers/infectedl4d1/female/gregrogers.mdl");
+			PrecacheModel("models/player/gregrogers/infectedl4d1/male_suit/gregrogers.mdl");
+			PrecacheModel("models/player/gregrogers/infectedl4d1/male_police/gregrogers.mdl");
+			PrecacheModel("models/player/gregrogers/infectedl4d1/male_military/gregrogers.mdl");
+			PrecacheModel("models/player/gregrogers/infectedl4d1/male_patient/gregrogers.mdl");
+		}
 	}
 #endif
 
@@ -704,6 +727,10 @@ void CCSPlayer::Spawn()
 	// cvars unless they are set to be lower than this.
 	//
 #ifdef TERROR
+	// Terror strike specific fixes for special infected: Make sure this is ready for when we need it.
+	m_bDiedHackFix = true;
+	m_bShouldRagdoll = true;
+
 	if (CSGameRules()->IsTerrorStrikeMap())
 	{
 		if (GetTeamNumber() == TEAM_CT)
@@ -831,7 +858,8 @@ void CCSPlayer::Spawn()
 		SetModel(models[randomIndex]);
 
 		// Emit a spawn sound because this helps me feel better knowing its working.
-		this->EmitSound("Zombie.Death");
+		if (CSGameRules()->m_bHasFirstWaveStarted)
+			this->EmitSound("Zombie.Death");
 	}
 	/*else
 	{
@@ -1017,14 +1045,21 @@ int CCSPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	return 1;
 }
 
-void CCSPlayer::Event_Killed( const CTakeDamageInfo &info )
+#ifdef TERROR
+void CCSPlayer::Event_Dying()
 {
-	SetArmorValue( 0 );
+	// do we actually need to use this event?
+}
+#endif
+
+void CCSPlayer::Event_Killed(const CTakeDamageInfo &info)
+{
+	SetArmorValue(0);
 
 	DropWeapons();
 
 	// Just in case the progress bar is on screen, kill it.
-	SetProgressBarTime( 0 );
+	SetProgressBarTime(0);
 
 	m_bIsDefusing = false;
 
@@ -1038,25 +1073,81 @@ void CCSPlayer::Event_Killed( const CTakeDamageInfo &info )
 	FlashlightTurnOff();
 
 	// show killer in death cam mode
-	SetObserverTarget( info.GetAttacker() );
+	SetObserverTarget(info.GetAttacker());
 
 	//update damage info with our accumulated physics force
 	CTakeDamageInfo subinfo = info;
-	subinfo.SetDamageForce( m_vecTotalBulletForce );
+	subinfo.SetDamageForce(m_vecTotalBulletForce);
 
 	//Adrian: Select a death pose to extrapolate the ragdoll's velocity.
-	SelectDeathPose( info );
+	SelectDeathPose(info);
 
 	// See if there's a ragdoll magnet that should influence our force.
-	CRagdollMagnet *pMagnet = CRagdollMagnet::FindBestMagnet( this );
-	if( pMagnet )
+	CRagdollMagnet *pMagnet = CRagdollMagnet::FindBestMagnet(this);
+	if (pMagnet)
 	{
-		m_vecTotalBulletForce += pMagnet->GetForceVector( this );
+		m_vecTotalBulletForce += pMagnet->GetForceVector(this);
 	}
 
 	// Note: since we're dead, it won't draw us on the client, but we don't set EF_NODRAW
 	// because we still want to transmit to the clients in our PVS.
+#ifdef TERROR
+	bool bIsTerror = CSGameRules()->IsTerrorStrikeMap();
+
+
+	if (bIsTerror && m_bDiedHackFix && ((GetTeamNumber() == TEAM_TERRORIST && info.GetDamageType() & (DMG_BLAST) || m_IsSpecialInfected && !m_IsSmoker)))
+	{
+		// These are required as this function runs multiple times.
+		this->m_bDiedHackFix = false;
+		this->m_bShouldRagdoll = false;
+
+		SetCollisionGroup(COLLISION_GROUP_NONE);
+		Vector vecDamageDir = info.GetDamageForce();
+		UTIL_BloodSpray(WorldSpaceCenter(), vecDamageDir, BLOOD_COLOR_RED, 52, FX_BLOODSPRAY_ALL);
+		CGib::SpawnSpecificGibs(this, 1, 1, 1500, "models/player/gibs/t_phoenix_gib1.mdl", 20);
+		CGib::SpawnSpecificGibs(this, 1, 1, 1500, "models/player/gibs/t_phoenix_gib2.mdl", 20);
+		CGib::SpawnSpecificGibs(this, 1, 1, 1500, "models/player/gibs/t_phoenix_gib3.mdl", 20);
+		CGib::SpawnSpecificGibs(this, 3, 1, 1500, "models/player/gibs/t_phoenix_gib4.mdl", 20);
+		CGib::SpawnSpecificGibs(this, 1, 1, 1500, "models/player/gibs/t_phoenix_gib5.mdl", 20);
+		CGib::SpawnSpecificGibs(this, 1, 1, 1500, "models/player/gibs/t_phoenix_gib6.mdl", 20);
+		UTIL_BloodSpray(WorldSpaceCenter(), vecDamageDir, BLOOD_COLOR_RED, 52, FX_BLOODSPRAY_ALL);
+
+		DevMsg("I died and gibbed.\n");
+
+		// Bad code need to refactor but works for now
+		if (m_IsSpecialInfected)
+		{
+			SetCollisionGroup(COLLISION_GROUP_NONE);
+
+			if (m_IsSmoker)
+			{
+				// TODO: Implement custom smoke grenade for this. Also figure out why smoke grenades dont like being forced to detonate.
+				CSmokeGrenade *SmokeyBoi = (CSmokeGrenade*)BaseClass::Create("weapon_smokegrenade", GetCentroid(this), GetAbsAngles(), this);
+				SmokeyBoi->Spawn();
+				SmokeyBoi->Activate();
+			}
+			else
+			{
+				// boom
+				ExplosionCreate(GetCentroid(this), GetAbsAngles(), this, 350, 200, true, 350, true, false);
+			}
+		}
+		m_IsSpecialInfected = false;
+		m_IsSmoker = false;
+	}
+	else if (m_bShouldRagdoll)
+	{
+		CreateRagdollEntity();
+	}
+	this->m_bDiedHackFix = false;
+	m_IsSpecialInfected = false;
+	m_IsSmoker = false;
+
+	// Set render colour back to white.
+	SetRenderColor(255, 255, 255);
+#else
 	CreateRagdollEntity();
+#endif
 
 	State_Transition( STATE_DEATH_ANIM );	// Transition into the dying state.
 	BaseClass::Event_Killed( subinfo );
@@ -1080,7 +1171,7 @@ void CCSPlayer::Event_Killed( const CTakeDamageInfo &info )
 	}
 
 #ifdef TERROR
-	if (CSGameRules()->IsTerrorStrikeMap() && terrorstrike_deathalerts.GetBool() && GetTeamNumber() == TEAM_TERRORIST)
+	if (bIsTerror && terrorstrike_deathalerts.GetBool() && GetTeamNumber() == TEAM_TERRORIST)
 	{
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
@@ -2297,6 +2388,12 @@ void CCSPlayer::RoundRespawn()
 	OutputDamageGiven();
 	OutputDamageTaken();
 	ResetDamageCounters();
+
+#ifdef TERROR
+	// Should always be cleared.
+	m_IsSmoker = false;
+	m_IsSpecialInfected = false;
+#endif
 }
 
 void CCSPlayer::CheckTKPunishment( void )

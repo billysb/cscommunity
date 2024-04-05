@@ -22,6 +22,7 @@
 #include "cs_player.h"
 #include "weapon_csbase.h"
 #include "nav_pathfind.h"
+#include "sbperceptron.h"
 
 class CBaseDoor;
 class CBasePropDoor;
@@ -434,6 +435,17 @@ public:
 
 	virtual void Walk( void );
 	virtual bool Jump( bool mustJump = false );					///< returns true if jump was started
+
+#ifdef SB_EXPERIMENTS
+	// 7 Inputs, 3 Hidden layers and 5 Outputs.
+
+	// Simple Perceptron Brain.
+	Perceptron p_Threat = Perceptron({ 7, 3, 5 } , 0.1);
+
+	std::vector<std::vector<float>> trainingInputs = { };
+	std::vector<std::vector<float>> trainingTargets = { };
+
+#endif
 
 	//- behavior properties ------------------------------------------------------------------------------------------
 	float GetCombatRange( void ) const;

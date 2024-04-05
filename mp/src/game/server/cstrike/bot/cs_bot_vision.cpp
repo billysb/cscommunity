@@ -1532,10 +1532,13 @@ CCSPlayer *CCSBot::FindMostDangerousThreat( void )
 			}
 		}
 
+		// Original bot code.
 		if ( sawCurrentThreat && !sawCloserThreat )
 		{
 			return currentThreat;
 		}
+
+		// If we dont how dont get a result from the neural network let the original bot code run. This should never happen but you never know.
 
 		// if we are a sniper and we see a sniper threat, attack it unless 
 		// there are other close enemies facing me

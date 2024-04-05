@@ -387,11 +387,22 @@ void BuyState::OnUpdate( CCSBot *me )
 	if (!me->IsInBuyZone())
 	{
 		m_doneBuying = true;
-		CONSOLE_ECHO( "%s bot spawned outside of a buy zone (%d, %d, %d)\n",
-						(me->GetTeamNumber() == TEAM_CT) ? "CT" : "Terrorist",
-						(int)me->GetAbsOrigin().x,
-						(int)me->GetAbsOrigin().y,
-						(int)me->GetAbsOrigin().z );
+
+		// Only output this fucking stupid shit outside of terror strike. I am sick of seeing it.
+#ifdef TERROR
+		if (!CSGameRules()->IsTerrorStrikeMap())
+			CONSOLE_ECHO("%s bot spawned outside of a buy zone (%d, %d, %d)\n",
+			(me->GetTeamNumber() == TEAM_CT) ? "CT" : "Terrorist",
+			(int)me->GetAbsOrigin().x,
+			(int)me->GetAbsOrigin().y,
+			(int)me->GetAbsOrigin().z);
+#else
+		CONSOLE_ECHO("%s bot spawned outside of a buy zone (%d, %d, %d)\n",
+			(me->GetTeamNumber() == TEAM_CT) ? "CT" : "Terrorist",
+			(int)me->GetAbsOrigin().x,
+			(int)me->GetAbsOrigin().y,
+			(int)me->GetAbsOrigin().z);
+#endif
 		return;
 	}
 

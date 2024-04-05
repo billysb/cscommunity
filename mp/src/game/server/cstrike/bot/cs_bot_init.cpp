@@ -98,6 +98,7 @@ void Bot_ServerCommand( void )
  */
 CCSBot::CCSBot( void ) : m_chatter( this ), m_gameState( this )
 {
+	//Percep = new Perceptron(2, 0.1);
 	m_hasJoined = false;
 }
 
@@ -108,6 +109,7 @@ CCSBot::CCSBot( void ) : m_chatter( this ), m_gameState( this )
  */
 CCSBot::~CCSBot()
 {
+	//delete Percep;
 }
 
 

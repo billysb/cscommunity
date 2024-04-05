@@ -417,8 +417,8 @@ void CCSBot::Update( void )
 
 			case SELF_DEFENSE:
 			{
-				// attack if fired on
-				doAttack = (IsPlayerLookingAtMe( threat, 0.99f ) && DidPlayerJustFireWeapon( threat ));
+				// attack if fired 
+				doAttack = (IsPlayerLookingAtMe(threat, 0.99f) && DidPlayerJustFireWeapon(threat));
 
 				// attack if enemy very close
 				if (!doAttack)
@@ -444,7 +444,7 @@ void CCSBot::Update( void )
 					else
 					{
 						// attack if fired on
-						doAttack = (IsPlayerLookingAtMe( threat, 0.99f ) && DidPlayerJustFireWeapon( threat ));					
+						doAttack = ( IsPlayerLookingAtMe(threat, 0.99f) && DidPlayerJustFireWeapon(threat) );
 					}
 				}
 				else
@@ -872,6 +872,40 @@ void CCSBot::Update( void )
 		}
 	}
 
+#ifdef SB_EXPERIMENTS
+	Vector MyPos = GetAbsOrigin();
+
+
+	std::vector<float> newInputs = { (float)GetHealth(), (float)MyPos.x, (float)MyPos.y, (float)MyPos.z, (IsSneaking() ? float(1) : float(0)), (float)m_nearbyFriendCount, (float)m_nearbyEnemyCount };
+	std::vector<float> outputs = p_Threat.feedforward(newInputs);
+
+	Msg("Outputs: %d %d %d %d %d\n", outputs[0], outputs[1], outputs[2], outputs[3], outputs[4]);
+
+	// Only certain things should happen during fighting
+	if (IsAttacking())
+	{
+		if (outputs[0] > 0)
+			Sneak(5.0f);
+		if (outputs[2] > 0)
+			UpdateLookAround();
+		if (outputs[4] > 0)
+		{
+			StandUp();
+			Jump();
+		}
+		if (outputs[3] > 0)
+			Crouch();
+	}
+	else
+	{
+		if (outputs[0] > 0)
+			Sneak(5.0f);
+		if (outputs[1] > 0)
+			BecomeAlert();
+		if (outputs[2] > 0)
+			UpdateLookAround();
+	}
+#endif
 	// remember our prior safe time status
 	m_wasSafe = IsSafe();
 }

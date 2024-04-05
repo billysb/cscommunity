@@ -505,7 +505,14 @@ void CCSBot::StuckCheck( void )
 					if (m_iStuckCounter > 50)
 					{
 						Msg("Zombie got stuck too many times! I will kill myself for the gameplay.\n");
-						SetHealth(0);
+						m_iStuckCounter = 0;
+
+						CTakeDamageInfo dmg;
+						dmg.SetAttacker(this); // same here.
+						dmg.SetInflictor(this); // Set killer for the bots.
+						dmg.AddDamage(1000);
+
+						TakeDamage(dmg);
 					}
 				}
 #endif
@@ -749,7 +756,7 @@ void CCSBot::Wiggle( void )
 	if (m_wiggleTimer.IsElapsed())
 	{
 		m_wiggleDirection = (NavRelativeDirType)RandomInt( 0, 3 );
-		m_wiggleTimer.Start( RandomFloat( 0.3f, 1.5f ) );		// Original values: 0.3, 0.5
+		m_wiggleTimer.Start( RandomFloat( 0.3f, 2.0f ) );		// Original values: 0.3, 0.5
 	}
 
 	Vector forward, right;
@@ -825,7 +832,7 @@ void CCSBot::Wiggle( void )
 	{
 		if (Jump())
 		{
-			m_stuckJumpTimer.Start( RandomFloat( 1.0f, 2.0f ) );
+			m_stuckJumpTimer.Start( RandomFloat( 2.0f, 3.0f ) );
 		}
 	}
 }

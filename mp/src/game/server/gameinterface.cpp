@@ -130,6 +130,11 @@ extern ConVar tf_mm_servermode;
 #include "replay/ireplaysystem.h"
 #endif
 
+#ifdef GE_LUA
+#include "ge_luamanager.h"
+#endif
+
+
 extern IToolFrameworkServer *g_pToolFrameworkServer;
 extern IParticleSystemQuery *g_pParticleSystemQuery;
 
@@ -743,6 +748,11 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	gamestatsuploader->InitConnection();
 #endif
 
+#ifdef GE_LUA
+	// Start LUA
+	GELua()->InitDll();
+#endif
+
 	return true;
 }
 
@@ -753,6 +763,11 @@ void CServerGameDLL::PostInit()
 
 void CServerGameDLL::DLLShutdown( void )
 {
+
+#ifdef GE_LUA
+	// Shutdown LUA, close all open gameplays
+	GELua()->ShutdownDll();
+#endif
 
 	// Due to dependencies, these are not autogamesystems
 	ModelSoundsCacheShutdown();

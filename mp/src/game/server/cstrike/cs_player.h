@@ -227,6 +227,9 @@ public:
 	virtual int			OnTakeDamage( const CTakeDamageInfo &inputInfo );
 	virtual int			OnTakeDamage_Alive( const CTakeDamageInfo &info );
 
+#ifdef TERROR
+	virtual void CCSPlayer::Event_Dying();
+#endif
 	virtual void		Event_Killed( const CTakeDamageInfo &info );
 	virtual void		TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &vecDir, trace_t *ptr );
 
@@ -330,6 +333,12 @@ public:
 
 	// Reset account, get rid of shield, etc..
 	void Reset();
+
+#ifdef TERROR
+	// True if this is the first EVENT_KILLED running.
+	bool m_bDiedHackFix;
+	bool m_bShouldRagdoll;
+#endif
 
 	void RoundRespawn( void );
 	void ObserverRoundRespawn( void );
@@ -511,6 +520,12 @@ private:
 	int	m_iDeathFrame;
 
 public:
+
+#ifdef TERROR
+	// Only 2 special infecteds for now.
+	bool m_IsSpecialInfected;
+	bool m_IsSmoker;
+#endif
 
 	// Predicted variables.
 	bool m_bResumeZoom;

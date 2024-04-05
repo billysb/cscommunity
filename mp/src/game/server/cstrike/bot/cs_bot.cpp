@@ -160,6 +160,21 @@ int CCSBot::OnTakeDamage( const CTakeDamageInfo &info )
 		}
 	}
 
+#ifdef SB_EXPERIMENTS
+	if (attacker->IsPlayer())
+	{
+		Vector MyPos = GetAbsOrigin();
+
+
+		std::vector<float> newInputs = { (float)GetHealth(), (float)MyPos.x, (float)MyPos.y, (float)MyPos.z, (IsSneaking() ? float(1) : float(0)), (float)m_nearbyFriendCount, (float)m_nearbyEnemyCount };
+		std::vector<float> newOutputs = { (newInputs[4] ? float(0) : float(1)), (IsAlert() ? float(0) : float(1) ), (IsLookingTowards(attacker) ? float(0) : float(1)), (IsCrouching() ? float(0) : float(1)), (IsJumping() ? float(0) : float(1))};
+
+
+		p_Threat.train(newInputs, newOutputs);
+		//p_Threat.train(train_input, 1);
+	}
+#endif
+
 	// extend
 	return BaseClass::OnTakeDamage( info );
 }
@@ -181,6 +196,24 @@ void CCSBot::Event_Killed( const CTakeDamageInfo &info )
 
 	// end voice feedback
 	m_voiceEndTimestamp = 0.0f;
+	
+#ifdef SB_EXPERIMENTS
+	CBaseEntity *Attacker = info.GetAttacker();
+
+	// Only in regular css
+	if (!CSGameRules()->IsTerrorStrikeMap() && Attacker != NULL && Attacker->IsPlayer())
+	{
+		// We died so we should probably unlearn custom behaviour. But go alert next time.
+		Vector MyPos = GetAbsOrigin();
+
+
+		std::vector<float> newInputs = { (float)GetHealth(), (float)MyPos.x, (float)MyPos.y, (float)MyPos.z, (IsSneaking() ? float(1) : float(0)), (float)m_nearbyFriendCount, (float)m_nearbyEnemyCount };
+		std::vector<float> newOutputs = { float(0), float(0), float(1), float(0), float(0) };
+
+
+		p_Threat.train(newInputs, newOutputs);
+	}
+#endif
 
 	// extend
 	BaseClass::Event_Killed( info );

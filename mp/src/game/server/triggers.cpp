@@ -39,6 +39,11 @@
 #include "hl2_player.h"
 #endif
 
+#ifdef GE_LUA
+#include "sb_lua_handler.h"
+#include "LuaBridge\LuaBridge.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -470,6 +475,19 @@ void CBaseTrigger::StartTouch(CBaseEntity *pOther)
 		}
 
 		m_OnStartTouch.FireOutput(pOther, this);
+#ifdef GE_LUA
+		LuaHandle* lh = GetLuaHandle();
+		if (lh && lh->m_bLuaLoaded)
+		{
+			lua_getglobal(lh->GetLua(), "OnTrigger");
+			if (!lua_isnil(lh->GetLua(), -1)) {
+				//luabridge::push(lh->GetLua(), this->GetEntityName().ToCStr());
+				luabridge::push(lh->GetLua(), this);
+				luabridge::push(lh->GetLua(), pOther);
+				CallLUA(lh->GetLua(), 2, 0, 0, "OnTrigger");
+			}
+		}
+#endif
 
 		if ( bAdded && ( m_hTouchingEntities.Count() == 1 ) )
 		{

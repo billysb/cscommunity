@@ -14,14 +14,14 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\cstrike\control,$SRCDIR\game\shared\cstrike,$SRCDIR\game\shared\cstrike\bot,.\cstrike,.\cstrike\bot,.\cstrike\bot\states,.\cstrike\hostage"
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\cstrike\control,$SRCDIR\game\shared\cstrike,.\lua,$SRCDIR\game\shared\cstrike\bot,.\cstrike,.\cstrike\bot,.\cstrike\bot\states,.\cstrike\hostage"
 		$AdditionalIncludeDirectories	"$BASE;.\community,$SRCDIR\game\shared\community"
 		$PreprocessorDefinitions		"$BASE;BOTS;CSTRIKE_DLL;COMMUNITY_DLL;GLOWS_ENABLE"
 	}
 
 	$Linker
 	{
-		$AdditionalDependencies			"$BASE ws2_32.lib" [$WIN32]
+		$AdditionalDependencies			"$BASE ws2_32.lib lua52.lib" [$WIN32]
 	}
 }
 
@@ -157,6 +157,51 @@ $Project "Server"
 			$File	"$SRCDIR\game\shared\cstrike\weapon_usp.cpp"
 			$File	"$SRCDIR\game\shared\cstrike\weapon_xm1014.cpp"
 
+			$Folder "Lua"
+			{
+				$Folder "LuaBridge"
+				{
+					$Folder "detail"
+					{
+						$File	"lua\LuaBridge\detail\CFunctions.h"
+						$File	"lua\LuaBridge\detail\ClassInfo.h"
+						$File	"lua\LuaBridge\detail\Config.h"
+						$File	"lua\LuaBridge\detail\Constructor.h"
+						$File	"lua\LuaBridge\detail\dump.h"
+						$File	"lua\LuaBridge\detail\FuncTraits.h"
+						$File	"lua\LuaBridge\detail\Iterator.h"
+						$File	"lua\LuaBridge\detail\LuaException.h"
+						$File	"lua\LuaBridge\detail\LuaHelpers.h"
+						$File	"lua\LuaBridge\detail\LuaRef.h"
+						$File	"lua\LuaBridge\detail\Namespace.h"						
+						$File	"lua\LuaBridge\detail\Security.h"
+						$File	"lua\LuaBridge\detail\Stack.h"
+						$File	"lua\LuaBridge\detail\TypeList.h"
+						$File	"lua\LuaBridge\detail\TypeTraits.h"
+						$File	"lua\LuaBridge\detail\Userdata.h"
+					}
+					$File	"lua\LuaBridge\Array.h"
+					$File	"lua\LuaBridge\List.h"
+					$File	"lua\LuaBridge\LuaBridge.h"
+					$File	"lua\LuaBridge\Map.h"
+					$File	"lua\LuaBridge\Optional.h"
+					$File	"lua\LuaBridge\Pair.h"
+					$File	"lua\LuaBridge\RefCountedObject.h"
+					$File	"lua\LuaBridge\RefCountedPtr.h"
+					$File	"lua\LuaBridge\UnorderedMap.h"
+					$File	"lua\LuaBridge\Vector.h"
+				}
+				$File	"lua\ge_luamanager.cpp"
+				$File	"lua\ge_luamanager.h"
+				$File	"lua\sb_lua_handler.cpp"
+				$File	"lua\sb_lua_handler.h"
+			}
+			$Folder "SB"
+			{
+				$File	"sbperceptron.h"
+				$File	"SBtool.cpp"
+				$File	"SBtool.h"
+			}
 			$Folder	"Bot"
 			{
 				$File	"cstrike\bot\cs_bot.cpp"

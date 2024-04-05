@@ -159,6 +159,22 @@ void CCSBot::OnPlayerDeath( IGameEvent *event )
 								GetChatter()->Say( "NiceShotSir", 3.0f, delay );
 						}
 					}
+#ifdef SB_EXPERIMENTS
+					else if (killer && killer == this)
+					{
+						// I got a kill. Learn what things we did.
+						Vector MyPos = GetAbsOrigin();
+
+
+						std::vector<float> newInputs = { (float)GetHealth(), (float)MyPos.x, (float)MyPos.y, (float)MyPos.z, (IsSneaking() ? float(1) : float(0)), (float)m_nearbyFriendCount, (float)m_nearbyEnemyCount };
+						
+						// WannaLookAround is 0 because we killed the enemy so its safe to assume we was looking at the enemy.
+						std::vector<float> newOutputs = { (newInputs[4] ? float(1) : float(0)), (IsAlert() ? float(1) : float(0)), float(0), (IsCrouching() ? float(1) : float(0)), (IsJumping() ? float(1) : float(0)) };
+
+
+						p_Threat.train(newInputs, newOutputs);
+					}
+#endif
 				}
 			}
 		}

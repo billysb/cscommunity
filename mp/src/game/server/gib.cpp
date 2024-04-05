@@ -285,6 +285,10 @@ void CGib::SpawnSpecificGibs(	CBaseEntity*	pVictim,
 		{
 			pGib->SetOwnerEntity( pVictim );
 		}
+
+		// Attempt to fix fade out?
+		pGib->SetNextThink(gpGlobals->curtime + pGib->m_lifeTime);
+		pGib->SetThink(&CGib::SUB_FadeOut);
 	}
 }
 
@@ -399,6 +403,11 @@ bool CGib::SUB_AllowedToFade( void )
 		if( VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD || GetEFlags() & EFL_IS_BEING_LIFTED_BY_BARNACLE )
 			return false;
 	}
+
+#ifdef TERROR
+	// Gibs are never used in css anyway so might as well return true always.
+	return true;
+#endif
 
 	CBasePlayer *pPlayer = ( AI_IsSinglePlayer() ) ? UTIL_GetLocalPlayer() : NULL;
 

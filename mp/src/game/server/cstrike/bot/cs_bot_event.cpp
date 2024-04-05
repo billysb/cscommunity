@@ -424,4 +424,30 @@ void CCSBot::OnEnteredNavArea( CNavArea *newArea )
 	{
 		m_hasVisitedEnemySpawn = true;
 	}
+
+#ifdef TERROR
+	//TODO: We need a way to get lighting data.
+	/*
+	if (CSGameRules()->IsTerrorStrikeMap() && IsAlive())
+	{
+		
+		// Flash light stuff for zombie city.
+		if (m_lastNavArea->GetLightIntensity() < 1)
+		{
+			if (!IsEffectActive(EF_DIMLIGHT))
+			{
+				AddEffects(EF_DIMLIGHT);
+				EmitSound("Player.FlashlightOn");
+			}
+		}
+		else
+		{
+			if (IsEffectActive(EF_DIMLIGHT))
+			{
+				RemoveEffects(EF_DIMLIGHT);
+				EmitSound("Player.FlashlightOff");
+			}
+		}
+	}*/
+#endif
 }
