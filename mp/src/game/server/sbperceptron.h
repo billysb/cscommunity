@@ -1,3 +1,4 @@
+#ifdef SB_EXPERIMENTS
 #ifndef SBPERCEPT_H
 #define SBPERCEPT_H
 
@@ -16,17 +17,28 @@ private:
 	std::vector<std::vector<std::vector<float>>> weights; // Change double* to vector<vector<float>>
 	std::vector<int> layerSizes;
 	float learningRate; // Change double to float
+	bool IsLinear;
 
 public:
-	Perceptron(const std::vector<int>& layerSizes, float lr) : layerSizes(layerSizes), learningRate(lr) {
+	Perceptron(const std::vector<int>& layerSizes, float lr, bool IsLinear) : layerSizes(layerSizes), learningRate(lr), IsLinear(IsLinear) {
 		// Initialize weights to random values
 		for (size_t i = 1; i < layerSizes.size(); ++i) {
 			std::vector<std::vector<float>> layerWeights(layerSizes[i]); // Weight matrix for this layer
 			for (int j = 0; j < layerSizes[i]; ++j) {
 				std::vector<float> neuronWeights(layerSizes[i - 1] + 1); // +1 for bias
-				for (float k = 0; k < neuronWeights.size(); ++k) {
-					// Initialize weights to small random values
-					neuronWeights[k] = static_cast<float>((rand() % 100) / 100.0); // Random values between 0 and 1
+				if (!IsLinear)
+				{
+					for (float k = 0; k < neuronWeights.size(); ++k) {
+						// Initialize weights to small random values
+						neuronWeights[k] = static_cast<float>((rand() % 100) / 100.0); // Random values between 0 and 1
+					}
+				}
+				else
+				{
+					for (float k = 0; k < neuronWeights.size(); ++k) {
+						// Initialize weights to small random values
+						neuronWeights[k] = float(0); // Linear models should be 0.
+					}
 				}
 				layerWeights[j] = neuronWeights;
 			}
@@ -37,6 +49,11 @@ public:
 	// Activation function (sigmoid function)
 	float activate(float sum) {
 		return 1 / (1 + exp(-sum));
+	}
+
+	// linear activation. Good for prediction
+	float linear(float x) {
+		return x;
 	}
 
 	// Feedforward function
@@ -56,7 +73,10 @@ public:
 				// Add bias
 				sum += weights[i][j][outputs.size()];
 				// Apply activation function
-				newOutputs[j] = activate(sum);
+				if (!IsLinear)
+					newOutputs[j] = activate(sum);
+				else
+					newOutputs[j] = linear(sum);
 			}
 
 			outputs = newOutputs; // Update outputs for next layer
@@ -83,7 +103,10 @@ public:
 				// Add bias
 				sum += weights[i][j][layerOutputs[i].size()];
 				// Apply activation function
-				newOutputs[j] = activate(sum);
+				if (!IsLinear)
+					newOutputs[j] = activate(sum);
+				else
+					newOutputs[j] = linear(sum);
 			}
 
 			layerOutputs.push_back(newOutputs); // Update outputs for next layer
@@ -122,5 +145,7 @@ public:
 		}
 	}
 };
+
+#endif
 
 #endif

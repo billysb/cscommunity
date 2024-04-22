@@ -1,0 +1,10 @@
+"patch"
+{
+	// all the it proxy stuff is included from here
+	"include" "materials/models/survivors/survivors_it_shared.vmt"
+
+	"insert"
+	{
+	"$basetexture" "models/survivors/original_zoey/TeenAngst_Body"
+	"$nocull" 1
+}

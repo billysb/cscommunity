@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/survivors/original_zoey/TeenAngst_Body"
+	"$nocull" 1
+}

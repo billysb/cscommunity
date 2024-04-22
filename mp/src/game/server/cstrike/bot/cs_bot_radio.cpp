@@ -316,6 +316,38 @@ void CCSBot::SendRadioMessage( RadioType event )
 	}
 }
 
+#include <cstring>
+
+const char* ExtractFileName(const char* filePath) {
+	const char* fileName = strrchr(filePath, '\\');
+	if (!fileName) {
+		fileName = strrchr(filePath, '\\');
+	}
+	return fileName ? fileName + 1 : filePath;
+}
+
+const char* ExtractDirectory(const char* filePath) {
+	const char* fileName = ExtractFileName(filePath);
+	ptrdiff_t len = fileName - filePath;
+	char* directory = new char[len + 1];
+	Q_strncpy(directory, filePath, len);
+	directory[len] = '\0';
+	return directory;
+}
+
+const char* CombinePath(const char* filePath, const char* custom, const char* fileName) {
+	const char* directory = ExtractDirectory(filePath);
+	size_t len1 = strlen(directory);
+	size_t len2 = strlen(custom);
+	size_t len3 = strlen(fileName);
+	char* newFilePath = new char[len1 + len2 + len3 + 1];
+	Q_strncpy(newFilePath, directory, len1);
+	Q_strncpy(newFilePath + len1, custom, len2);
+	Q_strncpy(newFilePath + len1 + len2, fileName, len3);
+	newFilePath[len1 + len2 + len3] = '\0';
+	delete[] directory;
+	return newFilePath;
+}
 
 //--------------------------------------------------------------------------------------------------------------
 /**
@@ -332,15 +364,116 @@ void CCSBot::SpeakAudio( const char *voiceFilename, float duration, int pitch )
 	CRecipientFilter filter;
 	ConstructRadioFilter( filter );
 
+	const char* VoiceID = m_profile->GetVoiceID();
+	const char *targetFilename;
+	if (VoiceID != NULL)
+	{
+		Msg("Old: %s\n", voiceFilename);
+		const char* position = Q_strrchr(voiceFilename, '\\');
+
+		if (position != nullptr)
+		{
+			const char* Prefix = "\\";
+			// Calculate the index of '\' in the string
+			int index = position - voiceFilename;
+
+			// Calculate the length of the resulting string
+			int newLength = Q_strlen(voiceFilename) + Q_strlen(VoiceID) + 2; // the 2 is the extra \
+
+			// Allocate memory for the new string
+			char* result = new char[newLength + 1];
+
+			// Copy the string up to the '\' character
+			Q_strncpy(result, voiceFilename, index+1);
+			result[index] = '\0';
+
+			Q_strcat(result, Prefix, 128);
+
+			// Append the custom string
+			Q_strcat(result, VoiceID, 128);
+
+			Q_strcat(result, Prefix, 128);
+
+			// Append the rest of the original string after '\'
+			Q_strcat(result, position + 1, 128);
+			Msg("New: %s\n", result);
+			targetFilename = result;
+		}
+		else
+		{
+			targetFilename = voiceFilename;
+		}
+	}
+	else
+	{
+		targetFilename = voiceFilename;
+	}
+
+	// Disgusting hack for custom voices here.
+	/*const char* VoiceID = m_profile->GetVoiceID();
+	const char *targetFilename;
+
+	if (VoiceID != NULL)
+	{
+		const char *last_occurrence = NULL;
+		while (*voiceFilename) {
+			if (*voiceFilename == '/') {
+				last_occurrence = voiceFilename;
+			}
+			voiceFilename++;
+		}
+		
+		
+		if (last_occurrence != NULL)
+		{
+			// We now need to calculate the new filename.
+			
+			size_t voiceFilenameLen = strlen(voiceFilename);
+			size_t prefixLen = strlen(VoiceID);
+			
+			// Calculate the length of the part before the filename
+			size_t prefixPos = last_occurrence - voiceFilename + 1;
+
+			// Allocate memory for the new filename
+			char *newFilename = new char[voiceFilenameLen + prefixLen + 2];
+
+			// Copy the part before the filename
+			Q_strncpy(newFilename, voiceFilename, prefixPos);
+
+			// Copy the prefix
+			strcpy(newFilename + prefixPos, VoiceID);
+
+			// Copy the '/' separator
+			newFilename[prefixPos + prefixLen] = '/';
+
+			// Copy the rest of the filename
+			strcpy(newFilename + prefixPos + prefixLen + 1, voiceFilename + prefixPos);
+			targetFilename = newFilename;
+		}
+		else
+		{
+			targetFilename = voiceFilename;
+		}
+	}
+	else
+	{
+		targetFilename = voiceFilename;
+	}
+
+	Msg("New filename: %s\n", targetFilename);*/
+
 	UserMessageBegin ( filter, "RawAudio" );
 		WRITE_BYTE( pitch );
 		WRITE_BYTE( entindex() );
 		WRITE_FLOAT( duration );
-		WRITE_STRING( voiceFilename );
+		WRITE_STRING(targetFilename);
 	MessageEnd();
 
 	GetChatter()->ResetRadioSilenceDuration();
 
 	m_voiceEndTimestamp = gpGlobals->curtime + duration;
+	if (voiceFilename != targetFilename)
+		delete[] targetFilename;
+
 }
 

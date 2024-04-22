@@ -351,7 +351,7 @@
 	"volume"	"1"
 	"CompatibilityAttenuation"	"1.0"
 
-	"wave"	")items/equip_nvg.wav"
+	"wave"	"items/equip_nvg.wav"
 }
 
 "Player.FlashlightOn"
@@ -735,7 +735,190 @@
 	"soundlevel"  	"SNDLVL_NONE"
 	"pitch"		"PITCH_NORM"
 
-	"wave"	"horde_sound.wav"
+	"rndwave"
+	{
+		"wave"	"the_horror1.wav"
+		"wave"	"the_horror2.wav"
+		"wave"	"the_horror3.wav"
+		"wave"	"the_horror4.wav"
+	}
+}
+
+"Terror.SmokerGas"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.5"
+	"soundlevel"  	"SNDLVL_NONE"
+	"pitch"		"PITCH_NORM"
+
+	"wave"	"bots/terror/Asphyxiation.wav"
+}
+
+"Zombie.Idle"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"CompatibilityAttenuation"	"1.0"
+
+	"rndwave"
+	{
+		"wave"	"bots/terror/infected/idle/breathing/breathing01.wav"
+		"wave"	"bots/terror/infected/idle/breathing/breathing08.wav"
+		"wave"	"bots/terror/infected/idle/breathing/breathing09.wav"
+		"wave"	"bots/terror/infected/idle/breathing/breathing10.wav"
+		"wave"	"bots/terror/infected/idle/breathing/breathing13.wav"
+		"wave"	"bots/terror/infected/idle/breathing/breathing16.wav"
+		"wave"	"bots/terror/infected/idle/breathing/breathing18.wav"
+		"wave"	"bots/terror/infected/idle/breathing/breathing25.wav"
+		"wave"	"bots/terror/infected/idle/breathing/breathing26.wav"
+		"wave"	"bots/terror/infected/idle/breathing/idle_breath_01.wav"
+		"wave"	"bots/terror/infected/idle/breathing/idle_breath_02.wav"
+		"wave"	"bots/terror/infected/idle/breathing/idle_breath_03.wav"
+		"wave"	"bots/terror/infected/idle/breathing/idle_breath_04.wav"
+		"wave"	"bots/terror/infected/idle/breathing/idle_breath_06.wav"
+		"wave"	"bots/terror/infected/idle/moaning/moan01.wav"
+		"wave"	"bots/terror/infected/idle/moaning/moan02.wav"
+		"wave"	"bots/terror/infected/idle/moaning/moan03.wav"
+		"wave"	"bots/terror/infected/idle/moaning/moan04.wav"
+		"wave"	"bots/terror/infected/idle/moaning/moan05.wav"
+		"wave"	"bots/terror/infected/idle/moaning/moan06.wav"
+		"wave"	"bots/terror/infected/idle/moaning/moan07.wav"
+		"wave"	"bots/terror/infected/idle/moaning/moan08.wav"
+		"wave"	"bots/terror/infected/idle/moaning/moan09.wav"
+		"wave"	"bots/terror/infected/idle/mumbling/mumbling01.wav"
+		"wave"	"bots/terror/infected/idle/mumbling/mumbling02.wav"
+		"wave"	"bots/terror/infected/idle/mumbling/mumbling03.wav"
+		"wave"	"bots/terror/infected/idle/mumbling/mumbling04.wav"
+		"wave"	"bots/terror/infected/idle/mumbling/mumbling05.wav"
+		"wave"	"bots/terror/infected/idle/mumbling/mumbling06.wav"
+		"wave"	"bots/terror/infected/idle/mumbling/mumbling07.wav"
+		"wave"	"bots/terror/infected/idle/mumbling/mumbling08.wav"
+	}
+}
+
+"Zombie.AngryIdle"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"CompatibilityAttenuation"	"1.0"
+
+	"rndwave"
+	{
+		"wave"	"bots/terror/infected/action/rage/male/rage_50.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_51.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_52.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_53.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_54.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_55.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_56.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_57.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_58.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_59.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_60.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_61.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_62.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_64.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_65.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_66.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_67.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_68.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_69.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_70.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_71.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_72.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_73.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_74.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_75.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_76.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_77.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_78.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_79.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_80.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_81.wav"
+		"wave"	"bots/terror/infected/action/rage/male/rage_82.wav"
+		"wave"	"bots/terror/infected/action/shoved/mp/shoved_02.wav"
+		"wave"	"bots/terror/infected/action/shoved/mp/shoved_04.wav"
+		"wave"	"bots/terror/infected/action/shoved/mp/shoved_13.wav"
+		"wave"	"bots/terror/infected/action/shoved/mp/shoved_16.wav"
+		"wave"	"bots/terror/infected/action/shoved/mp/shoved_long_1.wav"
+		"wave"	"bots/terror/infected/action/shoved/mp/shoved_long_2.wav"
+		"wave"	"bots/terror/infected/action/shoved/mp/shoved_long_3.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert13.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert16.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert22.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert23.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert25.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert26.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert27.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert36.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert37.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert38.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert39.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert40.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert41.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert42.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert43.wav"
+		"wave"	"bots/terror/infected/alert/alert/alert44.wav"
+		"wave"	"bots/terror/infected/alert/alert/male/alert50.wav"
+		"wave"	"bots/terror/infected/alert/alert/male/alert51.wav"
+		"wave"	"bots/terror/infected/alert/alert/male/alert52.wav"
+		"wave"	"bots/terror/infected/alert/alert/male/alert53.wav"
+		"wave"	"bots/terror/infected/alert/alert/male/alert54.wav"
+		"wave"	"bots/terror/infected/alert/alert/male/alert55.wav"
+		"wave"	"bots/terror/infected/alert/becomeAlert/hiss01.wav"
+		"wave"	"bots/terror/infected/alert/becomeAlert/howl01.wav"
+		"wave"	"bots/terror/infected/alert/becomeAlert/shout01.wav"
+		"wave"	"bots/terror/infected/alert/becomeAlert/shout02.wav"
+		"wave"	"bots/terror/infected/alert/becomeAlert/shout03.wav"
+		"wave"	"bots/terror/infected/alert/becomeAlert/shout04.wav"
+		"wave"	"bots/terror/infected/alert/becomeAlert/shout06.wav"
+		"wave"	"bots/terror/infected/alert/becomeAlert/shout07.wav"
+		"wave"	"bots/terror/infected/alert/becomeAlert/shout08.wav"
+		"wave"	"bots/terror/infected/alert/becomeAlert/shout09.wav"
+		"wave"	"bots/terror/infected/alert/becomeEnraged/alert24.wav"
+		"wave"	"bots/terror/infected/alert/becomeEnraged/become_enraged01.wav"
+		"wave"	"bots/terror/infected/alert/becomeEnraged/become_enraged02.wav"
+		"wave"	"bots/terror/infected/alert/becomeEnraged/become_enraged03.wav"
+		"wave"	"bots/terror/infected/alert/becomeEnraged/become_enraged06.wav"
+		"wave"	"bots/terror/infected/alert/becomeEnraged/become_enraged07.wav"
+		"wave"	"bots/terror/infected/alert/becomeEnraged/become_enraged09.wav"
+		"wave"	"bots/terror/infected/alert/becomeEnraged/become_enraged10.wav"
+		"wave"	"bots/terror/infected/alert/becomeEnraged/become_enraged11.wav"
+		"wave"	"bots/terror/infected/alert/becomeEnraged/become_enraged30.wav"
+		"wave"	"bots/terror/infected/alert/becomeEnraged/male/become_enraged40.wav"
+		"wave"	"bots/terror/infected/alert/becomeEnraged/male/become_enraged41.wav"
+		"wave"	"bots/terror/infected/alert/becomeEnraged/male/become_enraged42.wav"
+		"wave"	"bots/terror/infected/alert/becomeEnraged/male/become_enraged43.wav"
+	}
+}
+
+"Zombie.Attack"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"CompatibilityAttenuation"	"1.0"
+
+	"rndwave"
+	{
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim20.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim21.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim22.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim23.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim24.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim25.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim26.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim27.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim28.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim29.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim30.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim31.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim32.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim33.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim34.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim35.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim36.wav"
+		"wave"	"bots/terror/infected/action/rageAt/male/rage_at_victim37.wav"
+	}
 }
 
 "Zombie.Alert"
@@ -910,5 +1093,244 @@
 		"wave"	"bots/terror/infected/action/been_shot/male/been_shot_35.wav"
 		"wave"	"bots/terror/infected/action/been_shot/male/been_shot_36.wav"
 		"wave"	"bots/terror/infected/action/been_shot/male/been_shot_37.wav"
+	}
+}
+
+"Boomer.Spawn"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"CompatibilityAttenuation"	"1.0"
+	"pitch"		"PITCH_NORM"
+
+	"rndwave"
+	{
+		"wave"	"music/bacteria/BoomerBacteria.wav"
+		"wave"	"music/bacteria/BoomerBacteriaS.wav"
+	}
+}
+
+"Boomer.AngryIdle"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"CompatibilityAttenuation"	"1.0"
+	"pitch"		"PITCH_NORM"
+
+	"rndwave"
+	{
+		"wave"	"bots/terror/Boomer/voice/alert/Boomer_Alert_03.wav"
+		"wave"	"bots/terror/Boomer/voice/alert/Boomer_Alert_04.wav"
+		"wave"	"bots/terror/Boomer/voice/alert/Boomer_Alert_05.wav"
+		"wave"	"bots/terror/Boomer/voice/alert/Boomer_Alert_07.wav"
+		"wave"	"bots/terror/Boomer/voice/alert/Boomer_Alert_08.wav"
+		"wave"	"bots/terror/Boomer/voice/alert/Boomer_Alert_10.wav"
+	}
+}
+
+"Boomer.Idle"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"CompatibilityAttenuation"	"1.0"
+	"pitch"		"PITCH_NORM"
+
+	"rndwave"
+	{
+		"wave"	"bots/terror/Boomer/voice/idle/Boomer_Lurk_01.wav"
+		"wave"	"bots/terror/Boomer/voice/idle/Boomer_Lurk_02.wav"
+		"wave"	"bots/terror/Boomer/voice/idle/Boomer_Lurk_03.wav"
+		"wave"	"bots/terror/Boomer/voice/idle/Boomer_Lurk_04.wav"
+		"wave"	"bots/terror/Boomer/voice/idle/Boomer_Lurk_05.wav"
+		"wave"	"bots/terror/Boomer/voice/idle/Boomer_Lurk_06.wav"
+		"wave"	"bots/terror/Boomer/voice/idle/Boomer_Lurk_07.wav"
+		"wave"	"bots/terror/Boomer/voice/idle/Boomer_Lurk_08.wav"
+		"wave"	"bots/terror/Boomer/voice/idle/Boomer_Lurk_09.wav"
+		"wave"	"bots/terror/Boomer/voice/idle/Boomer_Lurk_10.wav"
+	}
+}
+
+"Boomer.Attack"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"CompatibilityAttenuation"	"1.0"
+	"pitch"		"PITCH_NORM"
+
+	"rndwave"
+	{
+		"wave"	"bots/terror/Boomer/voice/attack/Boomer_SpotPrey_05.wav"
+		"wave"	"bots/terror/Boomer/voice/attack/Boomer_SpotPrey_07.wav"
+		"wave"	"bots/terror/Boomer/voice/attack/Boomer_SpotPrey_09.wav"
+		"wave"	"bots/terror/Boomer/voice/attack/Boomer_SpotPrey_10.wav"
+		"wave"	"bots/terror/Boomer/voice/attack/Zombie10_Growl1.wav"
+		"wave"	"bots/terror/Boomer/voice/attack/Zombie10_Growl2.wav"
+		"wave"	"bots/terror/Boomer/voice/attack/Zombie10_Growl3.wav"
+		"wave"	"bots/terror/Boomer/voice/action/Zombie10_Growl4.wav"
+		"wave"	"bots/terror/Boomer/voice/action/Zombie10_Growl5.wav"
+	}
+}
+
+"Boomer.Pain"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"2.5"
+	"CompatibilityAttenuation"	"1.0"
+	"pitch"		"PITCH_NORM"
+
+	"rndwave"
+	{
+		"wave"	"bots/terror/Boomer/voice/pain/Boomer_Death_01.wav"
+		"wave"	"bots/terror/Boomer/voice/pain/Boomer_Death_02.wav"
+		"wave"	"bots/terror/Boomer/voice/pain/Boomer_Death_03.wav"
+		"wave"	"bots/terror/Boomer/voice/pain/Boomer_Death_04.wav"
+		"wave"	"bots/terror/Boomer/voice/pain/Boomer_Death_05.wav"
+		"wave"	"bots/terror/Boomer/voice/pain/Boomer_Death_06.wav"
+		"wave"	"bots/terror/Boomer/voice/pain/Boomer_PainShort_02.wav"
+		"wave"	"bots/terror/Boomer/voice/pain/Boomer_PainShort_03.wav"
+		"wave"	"bots/terror/Boomer/voice/pain/Boomer_PainShort_04.wav"
+		"wave"	"bots/terror/Boomer/voice/pain/Boomer_PainShort_05.wav"
+		"wave"	"bots/terror/Boomer/voice/pain/Boomer_PainShort_06.wav"
+		"wave"	"bots/terror/Boomer/voice/pain/Boomer_PainShort_07.wav"
+	}
+}
+
+"Boomer.Death"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"1"
+	"CompatibilityAttenuation"	"1.0"
+	"pitch"		"PITCH_NORM"
+
+	"rndwave"
+	{
+		"wave"	"bots/terror/Boomer/explode/Explo_Medium_09.wav"
+		"wave"	"bots/terror/Boomer/explode/Explo_Medium_10.wav"
+		"wave"	"bots/terror/Boomer/explode/Explo_Medium_14.wav"
+	}
+}
+
+"Smoker.Spawn"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"1"
+	"CompatibilityAttenuation"	"1.0"
+	"pitch"		"PITCH_NORM"
+
+	"rndwave"
+	{
+		"wave"	"music/bacteria/SmokerBacteria.wav"
+		"wave"	"music/bacteria/SmokerBacteriaS.wav"
+	}
+}
+
+"Smoker.Idle"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"1"
+	"CompatibilityAttenuation"	"1.0"
+	"pitch"		"PITCH_NORM"
+
+	"rndwave"
+	{
+		"wave"	"bots/terror/smoker/voice/idle/gas_cough_1.wav"
+		"wave"	"bots/terror/smoker/voice/idle/gas_cough_gasp_1.wav"
+		"wave"	"bots/terror/smoker/voice/idle/gas_gasp_1.wav"
+		"wave"	"bots/terror/smoker/voice/idle/gas_gasp_2.wav"
+		"wave"	"bots/terror/smoker/voice/idle/gas_gasp_3.wav"
+		"wave"	"bots/terror/smoker/voice/idle/gas_gasp_4.wav"
+		"wave"	"bots/terror/smoker/voice/idle/gas_gasp_5.wav"
+		"wave"	"bots/terror/smoker/voice/idle/gas_gasp_6.wav"
+		"wave"	"bots/terror/smoker/voice/idle/Smoker_Lurk_01.wav"
+		"wave"	"bots/terror/smoker/voice/idle/Smoker_Lurk_03.wav"
+		"wave"	"bots/terror/smoker/voice/idle/Smoker_Lurk_04.wav"
+		"wave"	"bots/terror/smoker/voice/idle/Smoker_Lurk_06.wav"
+		"wave"	"bots/terror/smoker/voice/idle/Smoker_Lurk_08.wav"
+		"wave"	"bots/terror/smoker/voice/idle/Smoker_SpotPrey_01.wav"
+		"wave"	"bots/terror/smoker/voice/idle/Smoker_SpotPrey_02.wav"
+		"wave"	"bots/terror/smoker/voice/idle/Smoker_SpotPrey_07.wav"
+		"wave"	"bots/terror/smoker/voice/idle/Smoker_SpotPrey_08.wav"
+	}
+}
+
+"Smoker.AngryIdle"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"1"
+	"CompatibilityAttenuation"	"1.0"
+	"pitch"		"PITCH_NORM"
+
+	"rndwave"
+	{
+		"wave"	"bots/terror/smoker/voice/alert/Smoker_Alert_01.wav"
+		"wave"	"bots/terror/smoker/voice/alert/Smoker_Alert_02.wav"
+		"wave"	"bots/terror/smoker/voice/alert/Smoker_Alert_03.wav"
+		"wave"	"bots/terror/smoker/voice/warn/Smoker_Warn_01.wav"
+		"wave"	"bots/terror/smoker/voice/warn/Smoker_Warn_03.wav"
+		"wave"	"bots/terror/smoker/voice/idle/Smoker_SpotPrey_01.wav"
+		"wave"	"bots/terror/smoker/voice/idle/Smoker_SpotPrey_02.wav"
+		"wave"	"bots/terror/smoker/voice/idle/Smoker_SpotPrey_07.wav"
+		"wave"	"bots/terror/smoker/voice/idle/Smoker_SpotPrey_08.wav"
+	}
+}
+
+"Smoker.Attack"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"1"
+	"CompatibilityAttenuation"	"1.0"
+	"pitch"		"PITCH_NORM"
+
+	"rndwave"
+	{
+		"wave"	"bots/terror/smoker/voice/attack/Smoker_Attack_01.wav"
+		"wave"	"bots/terror/smoker/voice/attack/Smoker_Attack_02.wav"
+		"wave"	"bots/terror/smoker/voice/attack/Smoker_Attack_03.wav"
+		"wave"	"bots/terror/smoker/voice/attack/Smoker_Attack_04.wav"
+		"wave"	"bots/terror/smoker/voice/attack/Smoker_Attack_05.wav"
+		"wave"	"bots/terror/smoker/voice/attack/Smoker_Attack_06.wav"
+		"wave"	"bots/terror/smoker/voice/attack/Smoker_Attack_07.wav"
+		"wave"	"bots/terror/smoker/voice/attack/Smoker_Attack_08.wav"
+		"wave"	"bots/terror/smoker/voice/attack/Smoker_Attack_09.wav"
+		"wave"	"bots/terror/smoker/voice/attack/Smoker_Attack_10.wav"
+		"wave"	"bots/terror/smoker/voice/attack/Smoker_Attack_11.wav"
+	}
+}
+
+"Smoker.Pain"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"1"
+	"CompatibilityAttenuation"	"1.0"
+	"pitch"		"PITCH_NORM"
+
+	"rndwave"
+	{
+		"wave"	"bots/terror/smoker/voice/pain/Smoker_Pain_02.wav"
+		"wave"	"bots/terror/smoker/voice/pain/Smoker_Pain_03.wav"
+		"wave"	"bots/terror/smoker/voice/pain/Smoker_Pain_04.wav"
+		"wave"	"bots/terror/smoker/voice/pain/Smoker_Pain_05.wav"
+		"wave"	"bots/terror/smoker/voice/pain/Smoker_Pain_06.wav"
+		"wave"	"bots/terror/smoker/voice/pain/Smoker_PainShort_01.wav"
+		"wave"	"bots/terror/smoker/voice/pain/Smoker_PainShort_02.wav"
+		"wave"	"bots/terror/smoker/voice/pain/Smoker_PainShort_03.wav"
+		"wave"	"bots/terror/smoker/voice/pain/Smoker_PainShort_04.wav"
+		"wave"	"bots/terror/smoker/voice/pain/Smoker_PainShort_05.wav"
+		"wave"	"bots/terror/smoker/voice/pain/Smoker_PainShort_06.wav"
+	}
+}
+
+"Smoker.Death"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"1"
+	"CompatibilityAttenuation"	"1.0"
+	"pitch"		"PITCH_NORM"
+
+	"rndwave"
+	{
+		"wave"	"bots/terror/smoker/voice/death/Smoker_Death_01.wav"
+		"wave"	"bots/terror/smoker/voice/death/Smoker_Death_02.wav"
+		"wave"	"bots/terror/smoker/voice/death/Smoker_Death_032.wav"
 	}
 }

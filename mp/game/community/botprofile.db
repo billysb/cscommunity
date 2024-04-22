@@ -22,6 +22,7 @@ Default
 	Cost = 0
 	Difficulty = NORMAL
 	VoicePitch = 100
+	//Voice = 0
 	Skin = 0
 End
 
@@ -217,6 +218,7 @@ End
 
 Elite Callum
 	VoicePitch = 95
+	Voice = 1
 End
 
 Elite Colton
@@ -286,7 +288,7 @@ End
 
 Elite+Rifle Funie
 	Skin = 2
-	VoicePitch = 115
+	Voice = 2
 End
 
 Elite+Rifle Cliffe
@@ -442,7 +444,7 @@ End
 
 Expert+Rifle Funie
 	Skin = 2
-	VoicePitch = 115
+	Voice = 2
 End
 
 Expert+RifleT Arnold
@@ -583,7 +585,7 @@ End
 
 VeryHard+Rifle Funie
 	Skin = 2
-	VoicePitch = 115
+	Voice = 2
 End
 
 VeryHard+Power Cory
@@ -705,7 +707,7 @@ End
 
 Hard+Rifle Funie
 	Skin = 2
-	VoicePitch = 115
+	Voice = 2
 End
 
 Hard+Rifle Chad
@@ -875,7 +877,7 @@ End
 
 Tough+Rifle Funie
 	Skin = 2
-	VoicePitch = 115
+	Voice = 2
 End
 
 Tough+Sniper Adrian
@@ -1075,7 +1077,7 @@ End
 
 Normal+Rifle Funie
 	Skin = 2
-	VoicePitch = 115
+	Voice = 2
 End
 
 Normal+Rifle Adam
@@ -1090,7 +1092,8 @@ End
 
 Normal+Shotgun Billy
 	Skin = 2
-	VoicePitch = 112
+	VoicePitch = 100
+	Voice = 1
 End
 
 Normal Chris
@@ -1290,7 +1293,7 @@ Fair Atoti
 End
 
 Fair Funie
-	VoicePitch = 115
+	Voice = 2
 End
 
 Fair Alfred
@@ -1481,7 +1484,8 @@ Easy Atoti
 End
 
 Easy Funie
-	VoicePitch = 115
+	Voice = 2
+	VoicePitch = 100
 End
 
 Easy Albert

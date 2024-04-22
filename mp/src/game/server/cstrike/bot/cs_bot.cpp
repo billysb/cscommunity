@@ -164,14 +164,26 @@ int CCSBot::OnTakeDamage( const CTakeDamageInfo &info )
 	if (attacker->IsPlayer())
 	{
 		Vector MyPos = GetAbsOrigin();
+		Vector AtPos = attacker->GetAbsOrigin();
+		float AreaID = -1;
+
+		if (m_currentArea != NULL)
+			AreaID = m_currentArea->GetID();
+		else if (GetLastKnownArea() != NULL)
+			AreaID = GetLastKnownArea()->GetID();
+
+		//std::vector<float> newInputs = { (float)GetHealth(), (float)MyPos.x, (float)MyPos.y, (float)MyPos.z, (IsSneaking() ? float(1) : float(0)), (float)m_nearbyFriendCount, (float)m_nearbyEnemyCount };
+		//std::vector<float> newOutputs = { (newInputs[4] ? float(0) : float(1)), (IsAlert() ? float(0) : float(1) ), (IsLookingTowards(attacker) ? float(0) : float(1)), (IsCrouching() ? float(0) : float(1)), (IsJumping() ? float(0) : float(1))};
 
 
-		std::vector<float> newInputs = { (float)GetHealth(), (float)MyPos.x, (float)MyPos.y, (float)MyPos.z, (IsSneaking() ? float(1) : float(0)), (float)m_nearbyFriendCount, (float)m_nearbyEnemyCount };
-		std::vector<float> newOutputs = { (newInputs[4] ? float(0) : float(1)), (IsAlert() ? float(0) : float(1) ), (IsLookingTowards(attacker) ? float(0) : float(1)), (IsCrouching() ? float(0) : float(1)), (IsJumping() ? float(0) : float(1))};
+		//p_Threat.train(newInputs, newOutputs);
 
 
-		p_Threat.train(newInputs, newOutputs);
-		//p_Threat.train(train_input, 1);
+		std::vector<float> newInputs = { AreaID };
+		std::vector<float> newOutputs = { (float)AtPos.x, (float)AtPos.y, (float)AtPos.z };
+
+		if (AreaID > -1)
+		p_LookThreatModel.train(newInputs, newOutputs);
 	}
 #endif
 
@@ -205,13 +217,28 @@ void CCSBot::Event_Killed( const CTakeDamageInfo &info )
 	{
 		// We died so we should probably unlearn custom behaviour. But go alert next time.
 		Vector MyPos = GetAbsOrigin();
+		Vector AtPos = Attacker->GetAbsOrigin();
+
+		float AreaID = -1;
+
+		if (m_currentArea != NULL)
+			AreaID = m_currentArea->GetID();
+		else if (GetLastKnownArea() != NULL)
+			AreaID = GetLastKnownArea()->GetID();
+
+		//std::vector<float> newInputs = { (float)GetHealth(), (float)MyPos.x, (float)MyPos.y, (float)MyPos.z, (IsSneaking() ? float(1) : float(0)), (float)m_nearbyFriendCount, (float)m_nearbyEnemyCount };
+		//std::vector<float> newOutputs = { float(0), float(0), float(1), float(0), float(0) };
 
 
-		std::vector<float> newInputs = { (float)GetHealth(), (float)MyPos.x, (float)MyPos.y, (float)MyPos.z, (IsSneaking() ? float(1) : float(0)), (float)m_nearbyFriendCount, (float)m_nearbyEnemyCount };
-		std::vector<float> newOutputs = { float(0), float(0), float(1), float(0), float(0) };
+		//p_Threat.train(newInputs, newOutputs);
 
+		// Attempt to learn to face this direction when we are passing by here.
 
-		p_Threat.train(newInputs, newOutputs);
+		std::vector<float> newInputs = { AreaID };
+		std::vector<float> newOutputs = { (float)AtPos.x, (float)AtPos.y, (float)AtPos.z };
+
+		if (AreaID > -1)
+			p_LookThreatModel.train(newInputs, newOutputs);
 	}
 #endif
 

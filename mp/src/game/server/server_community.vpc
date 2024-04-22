@@ -16,7 +16,7 @@ $Configuration
 	{
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\cstrike\control,$SRCDIR\game\shared\cstrike,.\lua,$SRCDIR\game\shared\cstrike\bot,.\cstrike,.\cstrike\bot,.\cstrike\bot\states,.\cstrike\hostage"
 		$AdditionalIncludeDirectories	"$BASE;.\community,$SRCDIR\game\shared\community"
-		$PreprocessorDefinitions		"$BASE;BOTS;CSTRIKE_DLL;COMMUNITY_DLL;GLOWS_ENABLE"
+		$PreprocessorDefinitions		"$BASE;BOTS;CSTRIKE_DLL;COMMUNITY_DLL;GLOWS_ENABLE;TERROR"c
 	}
 
 	$Linker
@@ -201,6 +201,9 @@ $Project "Server"
 				$File	"sbperceptron.h"
 				$File	"SBtool.cpp"
 				$File	"SBtool.h"
+				$File	"CZVoiceBox.cpp"
+				$File	"CZVoiceBox.h"
+				$File	"terror_smokersmoke.cpp"
 			}
 			$Folder	"Bot"
 			{

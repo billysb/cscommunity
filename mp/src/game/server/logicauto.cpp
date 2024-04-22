@@ -12,6 +12,9 @@
 #include "eventqueue.h"
 #include "mathlib/mathlib.h"
 #include "globalstate.h"
+#ifdef TERROR
+#include "cs_gamerules.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -45,6 +48,10 @@ private:
 	COutputEvent m_OnMultiNewMap;
 	COutputEvent m_OnMultiNewRound;
 
+#ifdef TERROR
+	COutputEvent m_OnTerrorStrikeMap;
+#endif
+
 	string_t m_globalstate;
 };
 
@@ -63,6 +70,9 @@ BEGIN_DATADESC( CLogicAuto )
 	DEFINE_OUTPUT(m_OnBackgroundMap, "OnBackgroundMap"),
 	DEFINE_OUTPUT(m_OnMultiNewMap, "OnMultiNewMap" ),
 	DEFINE_OUTPUT(m_OnMultiNewRound, "OnMultiNewRound" ),
+#ifdef TERROR
+	DEFINE_OUTPUT(m_OnTerrorStrikeMap, "OnTerrorStrikeMap"),
+#endif
 
 END_DATADESC()
 
@@ -110,13 +120,23 @@ void CLogicAuto::Think(void)
 			// In multiplayer, fire the new map / round events.
 			if ( g_pGameRules->InRoundRestart() )
 			{
+				DevMsg("m_OnMultiNewRound fired.\n");
 				m_OnMultiNewRound.FireOutput(NULL, this);
 			}
 			else
 			{
+				DevMsg("m_OnMultiNewMap fired.\n");
 				m_OnMultiNewMap.FireOutput(NULL, this);
 			}
 		}
+
+		// Terror strike specific shit.
+#ifdef TERROR
+		if (CSGameRules()->IsTerrorStrikeMap())
+		{
+			m_OnTerrorStrikeMap.FireOutput(NULL, this);
+		}
+#endif
 
 		if (m_spawnflags & SF_AUTO_FIREONCE)
 		{

@@ -1,0 +1,15 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/survivors/original_zoey/Zoey_Face"
+$bumpmap "models/survivors/original_zoey/Zoey_Face_NRM"
+$phong 1
+$phongboost "1.4"
+$phongexponent 12
+$phongtint "[.85 .85 1]"
+$phongfresnelranges "[.2 .5 5]"
+$nodecal 1
+$ambientocclusion 1
+$halflambert 0
+$diffuseexp "1.5"
+$lightwarptexture "models\survivors\original_zoey\zoey_head_wrp"
+}

@@ -361,6 +361,12 @@ ConCommand cc_CreatePredictionError( "CreatePredictionError", cc_CreatePredictio
 
 CCSPlayer::CCSPlayer()
 {
+#ifdef TERROR
+	// Give us a voicebox.
+	if (CSGameRules()->IsTerrorStrikeMap())
+		m_pVoiceBox = new CZVoiceBox(this);
+#endif
+
 	m_PlayerAnimState = CreatePlayerAnimState( this, this, LEGANIM_9WAY, true );
 
 	UseClientSideAnimation();
@@ -431,6 +437,10 @@ CCSPlayer::CCSPlayer()
 
 CCSPlayer::~CCSPlayer()
 {
+#ifdef TERROR
+	if (m_pVoiceBox)
+		delete m_pVoiceBox;
+#endif
 	delete m_pHintMessageQueue;
 	m_pHintMessageQueue = NULL;
 
@@ -446,6 +456,13 @@ CCSPlayer *CCSPlayer::CreatePlayer( const char *className, edict_t *ed )
 	return (CCSPlayer*)CreateEntityByName( className );
 }
 
+#ifdef TERROR
+bool CCSPlayer::IsZombie()
+{
+	// Advanced fucking zombie detection code right here.
+	return (m_pVoiceBox && GetTeamNumber() == TEAM_CT);
+}
+#endif
 
 void CCSPlayer::Precache()
 {
@@ -858,8 +875,8 @@ void CCSPlayer::Spawn()
 		SetModel(models[randomIndex]);
 
 		// Emit a spawn sound because this helps me feel better knowing its working.
-		if (CSGameRules()->m_bHasFirstWaveStarted)
-			this->EmitSound("Zombie.Death");
+		if (m_pVoiceBox)
+			m_pVoiceBox->DeathNoise();
 	}
 	/*else
 	{
@@ -966,6 +983,11 @@ int CCSPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		return 0;
 
 	// don't apply damage forces in CS
+
+#ifdef TERROR
+	if (IsZombie())
+		m_pVoiceBox->PainNoise();
+#endif
 
 	// fire global game event
 
@@ -1094,8 +1116,8 @@ void CCSPlayer::Event_Killed(const CTakeDamageInfo &info)
 #ifdef TERROR
 	bool bIsTerror = CSGameRules()->IsTerrorStrikeMap();
 
-
-	if (bIsTerror && m_bDiedHackFix && ((GetTeamNumber() == TEAM_TERRORIST && info.GetDamageType() & (DMG_BLAST) || m_IsSpecialInfected && !m_IsSmoker)))
+	// TODO: This is bad. smoker logic shouldnt be in the gibbing code.
+	if (bIsTerror && m_bDiedHackFix && ((GetTeamNumber() == TEAM_TERRORIST && info.GetDamageType() & (DMG_BLAST) || m_IsSpecialInfected)))
 	{
 		// These are required as this function runs multiple times.
 		this->m_bDiedHackFix = false;
@@ -1118,13 +1140,13 @@ void CCSPlayer::Event_Killed(const CTakeDamageInfo &info)
 		if (m_IsSpecialInfected)
 		{
 			SetCollisionGroup(COLLISION_GROUP_NONE);
+			CSGameRules()->m_iTotalSpecialsActive--;
 
 			if (m_IsSmoker)
 			{
 				// TODO: Implement custom smoke grenade for this. Also figure out why smoke grenades dont like being forced to detonate.
-				CSmokeGrenade *SmokeyBoi = (CSmokeGrenade*)BaseClass::Create("weapon_smokegrenade", GetCentroid(this), GetAbsAngles(), this);
+				CBaseEntity *SmokeyBoi = BaseClass::Create("ent_smokergas", GetAbsOrigin(), GetAbsAngles(), this);
 				SmokeyBoi->Spawn();
-				SmokeyBoi->Activate();
 			}
 			else
 			{
@@ -1207,11 +1229,12 @@ void CCSPlayer::DeathSound( const CTakeDamageInfo &info )
 		{
 			if (m_LastHitGroup == HITGROUP_HEAD)
 			{
+				// Currently no option to handle this in the voicebox yet..
 				EmitSound("Zombie.DeathHeadShot");
 			}
 			else
 			{
-				EmitSound("Zombie.Death");
+				m_pVoiceBox->DeathNoise();
 			}
 		}
 	}
@@ -1577,6 +1600,15 @@ void CCSPlayer::PostThink()
 		// Cycle is a float from 0 to 1.  We don't need to transmit a whole float for that.  Compress it in to a small fixed point
 		m_cycleLatch.GetForModify() = 16 * GetCycle();// 4 point fixed
 	}
+
+#ifdef TERROR
+	// If we have a voice box then fucking use it.
+	if (m_pVoiceBox && IsZombie())
+	{
+		m_pVoiceBox->Update();
+		m_pVoiceBox->Think();
+	}
+#endif
 }
 
 
@@ -1672,9 +1704,9 @@ bool CCSPlayer::IsArmored( int nHitGroup )
 void CCSPlayer::Pain( bool bHasArmour )
 {
 #ifdef TERROR
-	if (CSGameRules()->IsTerrorStrikeMap() && GetTeamNumber() == TEAM_CT)
+	if (IsZombie())
 	{
-		EmitSound("Zombie.Pain");
+		m_pVoiceBox->PainNoise();
 	}
 	else
 	{

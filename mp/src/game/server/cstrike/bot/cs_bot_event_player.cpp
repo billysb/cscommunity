@@ -162,17 +162,30 @@ void CCSBot::OnPlayerDeath( IGameEvent *event )
 #ifdef SB_EXPERIMENTS
 					else if (killer && killer == this)
 					{
-						// I got a kill. Learn what things we did.
+						// I got a kill. Learn to expect them there again.
 						Vector MyPos = GetAbsOrigin();
+						Vector AtPos = killer->GetAbsOrigin();
 
+						float AreaID = -1;
 
-						std::vector<float> newInputs = { (float)GetHealth(), (float)MyPos.x, (float)MyPos.y, (float)MyPos.z, (IsSneaking() ? float(1) : float(0)), (float)m_nearbyFriendCount, (float)m_nearbyEnemyCount };
+						if (m_currentArea != NULL)
+							AreaID = m_currentArea->GetID();
+						else if (GetLastKnownArea() != NULL)
+							AreaID = GetLastKnownArea()->GetID();
+
+						std::vector<float> newInputs = { AreaID };
+						std::vector<float> newOutputs = { (float)AtPos.x, (float)AtPos.y, (float)AtPos.z };
+
+						if (AreaID > -1)
+							p_LookThreatModel.train(newInputs, newOutputs);
+
+						//std::vector<float> newInputs = { (float)GetHealth(), (float)MyPos.x, (float)MyPos.y, (float)MyPos.z, (IsSneaking() ? float(1) : float(0)), (float)m_nearbyFriendCount, (float)m_nearbyEnemyCount };
 						
 						// WannaLookAround is 0 because we killed the enemy so its safe to assume we was looking at the enemy.
-						std::vector<float> newOutputs = { (newInputs[4] ? float(1) : float(0)), (IsAlert() ? float(1) : float(0)), float(0), (IsCrouching() ? float(1) : float(0)), (IsJumping() ? float(1) : float(0)) };
+						//std::vector<float> newOutputs = { (newInputs[4] ? float(1) : float(0)), (IsAlert() ? float(1) : float(0)), float(0), (IsCrouching() ? float(1) : float(0)), (IsJumping() ? float(1) : float(0)) };
 
 
-						p_Threat.train(newInputs, newOutputs);
+						//p_Threat.train(newInputs, newOutputs);
 					}
 #endif
 				}

@@ -17,7 +17,9 @@
 #include "cs_autobuy.h"
 #include "utldict.h"
 
-
+#ifdef TERROR
+#include "CZVoiceBox.h"
+#endif
 
 class CWeaponCSBase;
 class CMenu;
@@ -228,6 +230,7 @@ public:
 	virtual int			OnTakeDamage_Alive( const CTakeDamageInfo &info );
 
 #ifdef TERROR
+
 	virtual void CCSPlayer::Event_Dying();
 #endif
 	virtual void		Event_Killed( const CTakeDamageInfo &info );
@@ -335,6 +338,12 @@ public:
 	void Reset();
 
 #ifdef TERROR
+	// Used by zombies.
+	bool m_bIsAngry;
+
+	// Next noise time for zombies.
+	float m_fNextNoiseTime;
+
 	// True if this is the first EVENT_KILLED running.
 	bool m_bDiedHackFix;
 	bool m_bShouldRagdoll;
@@ -462,8 +471,12 @@ public:
 	void State_Transition( CSPlayerState newState );	// Cleanup the previous state and enter a new state.
 	CSPlayerState State_Get() const;				// Get the current state.
 
-
+#ifdef TERROR
+	bool IsZombie(void);
+	CZVoiceBox* m_pVoiceBox;
+#endif
 private:
+
 	void State_Enter( CSPlayerState newState );		// Initialize the new state.
 	void State_Leave();								// Cleanup the previous state.
 	void State_PreThink();							// Update the current state.

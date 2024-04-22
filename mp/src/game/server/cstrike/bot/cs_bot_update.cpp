@@ -873,7 +873,7 @@ void CCSBot::Update( void )
 	}
 
 #ifdef SB_EXPERIMENTS
-	Vector MyPos = GetAbsOrigin();
+	/*Vector MyPos = GetAbsOrigin();
 
 
 	std::vector<float> newInputs = { (float)GetHealth(), (float)MyPos.x, (float)MyPos.y, (float)MyPos.z, (IsSneaking() ? float(1) : float(0)), (float)m_nearbyFriendCount, (float)m_nearbyEnemyCount };
@@ -904,7 +904,8 @@ void CCSBot::Update( void )
 			BecomeAlert();
 		if (outputs[2] > 0)
 			UpdateLookAround();
-	}
+	}*/
+	
 #endif
 	// remember our prior safe time status
 	m_wasSafe = IsSafe();

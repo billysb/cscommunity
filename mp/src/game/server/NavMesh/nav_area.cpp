@@ -691,7 +691,7 @@ void CNavArea::OnRoundRestart( void )
 	ClearAllNavCostEntities();
 
 	// Make sure we unblock blocked areas otherwise pathfinding will break. -BillySB
-	UnblockArea(TEAM_ANY);
+	//UnblockArea(TEAM_ANY);
 	UpdateBlockedFromNavBlockers();
 }
 
@@ -4639,6 +4639,10 @@ static ConCommand nav_update_blocked( "nav_update_blocked", CommandNavUpdateBloc
 bool CNavArea::IsBlocked( int teamID, bool ignoreNavBlockers ) const
 {
 	if ( ignoreNavBlockers && ( m_attributeFlags & NAV_MESH_NAV_BLOCKER ) )
+	{
+		return false;
+	}
+	else if ((m_attributeFlags & NAV_MESH_TRANSIENT) == false)
 	{
 		return false;
 	}

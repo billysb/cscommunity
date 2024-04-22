@@ -1,0 +1,20 @@
+VertexLitGeneric
+{
+$detail "models\survivors\survivor_it.vtf"
+$detailscale 3
+$detailblendfactor ".001" 
+$detailblendmode 0
+$ITAmount 0
+Proxies
+{
+IT
+{
+resultVar $ITAmount
+}
+Equals
+{
+srcVar1 $ITAmount
+resultVar $detailblendfactor
+}
+}
+}

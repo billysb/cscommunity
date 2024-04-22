@@ -440,10 +440,10 @@ public:
 	// 7 Inputs, 3 Hidden layers and 5 Outputs.
 
 	// Simple Perceptron Brain.
-	Perceptron p_Threat = Perceptron({ 7, 3, 5 } , 0.1);
+	; Perceptron p_Threat = Perceptron({ 7, 3, 5 }, 0.1, false);
 
-	std::vector<std::vector<float>> trainingInputs = { };
-	std::vector<std::vector<float>> trainingTargets = { };
+	// Try to learn to look at where to expect danger. 3 inputs and outputs with 12 hidden layers.
+	Perceptron p_LookThreatModel = Perceptron({ 1, 6, 3 }, 0.3, false);
 
 #endif
 

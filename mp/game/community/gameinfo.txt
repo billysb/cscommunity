@@ -13,6 +13,8 @@
 	{
 		"test_speakers"		1
 		"test_hardware"		1
+		"zombie_dev_spawntest" 1
+		"zombie_dev_luatest" 1
 	}
 	nodegraph 0
 

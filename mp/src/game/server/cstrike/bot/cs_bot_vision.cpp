@@ -678,6 +678,28 @@ void CCSBot::UpdateLookAround( bool updateNow )
 	// If we recently saw an enemy, look towards where we last saw them
 	// Unless we can hear them moving, in which case look towards the noise
 	//
+
+#ifdef SB_EXPERIMENTS
+	Vector MyPos = GetAbsOrigin();
+	float AreaID = -1;
+
+	if (m_currentArea != NULL)
+		AreaID = m_currentArea->GetID();
+	else if (GetLastKnownArea() != NULL)
+		AreaID = GetLastKnownArea()->GetID();
+
+	std::vector<float> Inputs = { AreaID };
+	std::vector<float> Results = p_LookThreatModel.feedforward(Inputs);
+
+	Msg("%d, %d, %d - Result\n", Results[0], Results[1], Results[2]);
+
+	if (AreaID > -1 && (Results[0] != 0 || Results[1] != 0 || Results[2] != 0))
+	{
+		SetLookAt("Neural network", Vector(Results[0], Results[1], Results[2]), PRIORITY_MEDIUM, 3.0f, false);
+		return;
+	}
+#endif
+
 	const float closeRange = 500.0f;
 	if (!IsNoiseHeard() || GetNoiseRange() > closeRange)
 	{
@@ -1317,6 +1339,24 @@ CCSPlayer *CCSBot::FindMostDangerousThreat( void )
 			// keep track of all visible threats
 			Vector d = GetAbsOrigin() - player->GetAbsOrigin();
 			float distSq = d.LengthSqr();
+
+#ifdef SB_EXPERIMENTS
+			Vector AtPos = player->GetAbsOrigin();
+			float AreaID = -1;
+
+			if (m_currentArea != NULL)
+				AreaID = m_currentArea->GetID();
+			else if (GetLastKnownArea() != NULL)
+				AreaID = GetLastKnownArea()->GetID();
+
+			std::vector<float> newInputs = { AreaID };
+			std::vector<float> newOutputs = { (float)AtPos.x, (float)AtPos.y, (float)AtPos.z };
+
+			if (AreaID > -1)
+			{
+				this->p_LookThreatModel.train(newInputs, newOutputs);
+			}
+#endif
 
 			// track enemy sniper threats
 			if (IsSniperRifle( player->GetActiveCSWeapon() ))
