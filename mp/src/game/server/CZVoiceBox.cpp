@@ -162,6 +162,8 @@ void CZVoiceBox::ForceUpdate(void)
 
 void CZVoiceBox::Update(void)
 {
+	// Insanely stupid macro to fix compile error of something we will never use outside of terror.
+#ifdef TERROR
 	if (m_fNextUpdateTime > gpGlobals->curtime)
 		return;
 
@@ -211,6 +213,7 @@ void CZVoiceBox::Update(void)
 
 	// Don't wastefully update.
 	m_fNextUpdateTime = gpGlobals->curtime + VOICEBOX_UPDATE_TIME + m_fUpdateOffset;
+#endif
 }
 
 void CZVoiceBox::Think(void)

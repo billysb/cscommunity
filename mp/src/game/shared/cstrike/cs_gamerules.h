@@ -112,6 +112,11 @@ public:
 	bool IsIntermission() const;
 	bool IsLogoMap() const;
 #ifdef TERROR
+	// lua exposed
+	void CCSGameRules::ForceZombieWaveTime(float newTime);
+	void CCSGameRules::SetTerrorMode(bool newState);
+	//
+
 	bool CCSGameRules::IsNavVisibleBySurvivors(CNavArea *Target);
 	Vector *CCSGameRules::GetNavmeshSpawnSpot(CBasePlayer *pTarget);
 #endif
@@ -340,8 +345,17 @@ public:
 	int m_iFreezeTime;		// (From mp_freezetime) - How many seconds long the intro round (when players are frozen) is.
 	float m_flRestartRoundTime;	// the global time when the round is supposed to end, if this is not 0
 #ifdef TERROR
+	int m_iMaxSpecialsAllowed;
+	int m_iTotalSpecialsActive;
+
 	float m_fZombieWaveTimeMax; // Max wave respawn time. (When the bomb is planted this will get reduced heavily)
 	float m_fZombieWaveTime; // How long to wait in seconds before respawning a wave of zombies. 
+	
+	// Time between picking a zombie to be a special infected.
+	float m_fSpecialTimeMax;
+	float m_fSpecialTime;
+	
+	bool m_bZombieRespawnAllowed;
 	bool m_bHasFirstWaveStarted;
 #endif
 

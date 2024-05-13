@@ -45,6 +45,7 @@ public:
 		m_reactionTime = 0.3f;
 		m_attackDelay = 0.0f;
 		m_teams = TEAM_UNASSIGNED;
+		m_voice = (char *)'0';
 		m_voiceBank = 0;
 		m_prefersSilencer = false;
 	}
@@ -53,6 +54,8 @@ public:
 	{
 		if ( m_name )
 			delete [] m_name;
+		if ( m_voice )
+			delete m_voice;
 	}
 
 	const char *GetName( void ) const					{ return m_name; }		///< return bot's name
@@ -72,6 +75,7 @@ public:
 	int GetVoicePitch( void ) const						{ return m_voicePitch; }
 	float GetReactionTime( void ) const					{ return m_reactionTime; }
 	float GetAttackDelay( void ) const					{ return m_attackDelay; }
+	const char* GetVoiceID(void) const							{ return m_voice; }
 	int GetVoiceBank() const							{ return m_voiceBank; }
 
 	bool IsValidForTeam( int team ) const;
@@ -85,6 +89,7 @@ private:
 
 	void Inherit( const BotProfile *parent, const BotProfile *baseline );	///< copy values from parent if they differ from baseline
 
+	char *m_voice;
 	char *m_name;										///< the bot's name
 	float m_aggression;									///< percentage: 0 = coward, 1 = berserker
 	float m_skill;										///< percentage: 0 = terrible, 1 = expert

@@ -424,6 +424,13 @@ void BotProfileManager::Init( const char *filename, unsigned int *checksum )
 			{
 				profile->m_voicePitch = atoi(token);
 			}
+			else if (!stricmp("Voice", attributeName))
+			{
+				if (profile->m_name)
+					delete profile->m_name;
+
+				profile->m_name = token;
+			}
 			else if (!stricmp( "VoiceBank", attributeName ))
 			{
 				profile->m_voiceBank = FindVoiceBankIndex( token );

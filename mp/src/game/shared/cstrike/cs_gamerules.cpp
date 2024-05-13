@@ -47,6 +47,11 @@
 	#include "cs_urlretrieveprices.h"
 	#include "networkstringtable_gamedll.h"
 	
+	#ifdef GE_LUA
+		#include "sb_lua_handler.h"
+		#include "LuaBridge\LuaBridge.h"
+	#endif
+
 #endif
 
 
@@ -180,6 +185,10 @@ ConVar terrorstrike_maxwavetime("terror_maxwavetime", "15", FCVAR_REPLICATED, "M
 // Experimental spawning
 ConVar terrorstrike_newspawning("terror_use_experimental_spawns", "1", FCVAR_REPLICATED, "Determines whether to use the new navmesh spawn system. Might have a performance hit it is new. (can be either 1 or 0)");
 ConVar terrorstrike_max_spawn_search("terror_max_spawn_radius", "10", FCVAR_REPLICATED, "This is how many navmesh areas to travel and test for a valid spawn position.");
+
+// Special infected. Boomer and Smoker.
+ConVar terrorstrike_use_special_infected("terror_special_infected", "0", FCVAR_NOTIFY, "Should the game also include special infected?");
+ConVar terrorstrike_special_time("terror_special_time", "15", FCVAR_NOTIFY, "How often a random zombie should transform into a special infected on wave respawn.");
 #endif
 
 //ConVar mp_dynamicpricing( "mp_dynamicpricing", "0", FCVAR_REPLICATED, "Enables or Disables the dynamic weapon prices" );
@@ -554,14 +563,38 @@ ConVar cl_autohelp(
 
 	CCSGameRules::CCSGameRules()
 	{
+#ifdef GE_LUA
+		// TODO: We need to make sure we delete this afterwards.
+		if (!GetLuaHandle())
+		{
+			MyLuaHandle *handy = new MyLuaHandle();
+			handy->PassObjects(); // I am very inexperienced with binding lua to c++
+
+			LuaHandle* lh = GetLuaHandle();
+			if (lh && lh->m_bLuaLoaded)
+			{
+				lua_getglobal(lh->GetLua(), "OnLoad");
+				if (!lua_isnil(lh->GetLua(), -1)) {
+					CallLUA(lh->GetLua(), 0, 0, 0, "OnLoad");
+				}
+			}
+		}
+#endif
 		m_iRoundTime = 0;
 		m_iRoundWinStatus = WINNER_NONE;
 		m_iFreezeTime = 0;
 #ifdef TERROR
+		m_bZombieRespawnAllowed = true;
 		m_bHasFirstWaveStarted = false;
-		if (m_fZombieWaveTimeMax == NULL)
-			m_fZombieWaveTimeMax = terrorstrike_maxwavetime.GetFloat();
+
+		m_fSpecialTimeMax = terrorstrike_special_time.GetFloat(); // Temp value.
+		m_fZombieWaveTimeMax = terrorstrike_maxwavetime.GetFloat();
+		
 		m_fZombieWaveTime = 30;
+		m_fSpecialTime = 60;
+
+		m_iTotalSpecialsActive = 0;
+		m_iMaxSpecialsAllowed = 3;
 #endif
 
 		m_fRoundStartTime = 0;
@@ -680,6 +713,11 @@ ConVar cl_autohelp(
 		// Note, don't delete each team since they are in the gEntList and will 
 		// automatically be deleted from there, instead.
 		g_Teams.Purge();
+#ifdef GE_LUA
+		// Clean up.
+		if (GetLuaHandle())
+			DestroyLuaHandle();
+#endif
 	}
 
 	//-----------------------------------------------------------------------------
@@ -1353,6 +1391,16 @@ ConVar cl_autohelp(
 
 		// Figure out from the entities in the map what kind of map this is (bomb run, prison escape, etc).
 		CheckMapConditions();
+#ifdef GE_LUA
+		LuaHandle* lh = GetLuaHandle();
+		if (lh && lh->m_bLuaLoaded)
+		{
+			lua_getglobal(lh->GetLua(), "LevelInitPostEntity");
+			if (!lua_isnil(lh->GetLua(), -1)) {
+				CallLUA(lh->GetLua(), 0, 0, 0, "LevelInitPostEntity");
+			}
+		}
+#endif
 	}
 	
 	INetworkStringTable *g_StringTableBlackMarket = NULL;
@@ -2316,15 +2364,12 @@ ConVar cl_autohelp(
 				continue;
 
 #ifdef TERROR
-			if (m_bIsTerrorStrike)
+			if (m_bIsTerrorStrike && pPlayer->IsBot())
 			{
 				// We disable bots ability to reset on spawn. so do it here. a dirty hack.
 				// check cs_bot_init spawn() for ugly solution.
-				if (pPlayer->IsBot())
-				{
-					CCSBot *BotMe = static_cast<CCSBot *>(pPlayer);
-					BotMe->Reset();
-				}
+				CCSBot *BotMe = static_cast<CCSBot *>(pPlayer);
+				BotMe->Reset();
 			}
 #endif
 
@@ -2339,6 +2384,9 @@ ConVar cl_autohelp(
 				else
 				{
 					// We need to make sure we are dead for the wave spawner.
+					pPlayer->m_IsSpecialInfected = false;
+					pPlayer->m_IsSmoker = false;
+
 					CTakeDamageInfo dmg;
 					dmg.SetAttacker(pPlayer); // same here.
 					dmg.SetInflictor(pPlayer); // Set killer for the bots.
@@ -2390,7 +2438,10 @@ ConVar cl_autohelp(
 		// Give survivors lots of time to buy guns.
 		m_bHasFirstWaveStarted = false;
 		if (m_bIsTerrorStrike)
+		{
 			m_fZombieWaveTime = gpGlobals->curtime + 18;
+			m_fSpecialTime = gpGlobals->curtime; // we should have one asap when its the first wave.
+		}
 #endif
 
 		// Give C4 to the terrorists
@@ -2446,6 +2497,17 @@ ConVar cl_autohelp(
 		UploadGameStats();
 
 		CreateWeaponManager( "weapon_*", gpGlobals->maxClients * 2 );
+
+#ifdef GE_LUA
+		LuaHandle* lh = GetLuaHandle();
+		if (lh && lh->m_bLuaLoaded)
+		{
+			lua_getglobal(lh->GetLua(), "RoundStart");
+			if (!lua_isnil(lh->GetLua(), -1)) {
+				CallLUA(lh->GetLua(), 0, 0, 0, "RoundStart");
+			}
+		}
+#endif
 	}
 
 
@@ -2509,6 +2571,16 @@ ConVar cl_autohelp(
 			
 			pPlayer->m_iDisplayHistoryBits |= DHF_BOMB_RETRIEVED;
 			pPlayer->HintMessage( "#Hint_you_have_the_bomb", false, true );
+
+#ifdef TERROR
+			// This fixes bomb carrier bots from standing around idle in terror strike.
+			// this is a dirty hack because we dont let the bots reset themselves properly.
+			if (m_bIsTerrorStrike && pPlayer->HasC4() && pPlayer->IsBot())
+			{
+				CCSBot *BotMe = static_cast<CCSBot *>(pPlayer);
+				BotMe->GetGameState()->UpdateBomber(BotMe->GetAbsOrigin());
+			}
+#endif
 
 			// Log this information
 			//UTIL_LogPrintf("\"%s<%i><%s><TERRORIST>\" triggered \"Spawned_With_The_Bomb\"\n", 
@@ -2711,13 +2783,14 @@ ConVar cl_autohelp(
 		return false;
 	}
 
+#ifdef TERROR
 	void CCSGameRules::CheckZombieWaveTime()
 	{
-		if (gpGlobals->curtime < m_fZombieWaveTime)
+		if (!m_bZombieRespawnAllowed || gpGlobals->curtime < m_fZombieWaveTime)
 			return;
 
 		int survivor_count = 0;
-		CBasePlayer *survivors[ 65 ];
+		CBasePlayer *survivors[65];
 
 		// TODO: Efficient way to get survivors.
 		for (int o = 1; o <= gpGlobals->maxClients; ++o)
@@ -2736,12 +2809,20 @@ ConVar cl_autohelp(
 			CBasePlayer *player = UTIL_PlayerByIndex(i);
 			if (player == NULL)
 				continue;
-			
+
 			if (player->IsDead() && player->GetTeamNumber() == TEAM_CT)
 			{
 				// Only respawn TEAM_CT
 				CCSPlayer *csplayer = ToCSPlayer(player);
-				
+
+				// wait for special infected to finish dying.
+				if (csplayer->m_IsSpecialInfected)
+					continue;
+
+				// We are dead and are probably gonna be regular infected.
+				csplayer->m_IsSmoker = false;
+				csplayer->m_IsSpecialInfected = false;
+
 				// EDIT: DO NOT RESET THE PLAYER! if they are a bot it will fuck them up.
 				//csplayer->Reset();
 				csplayer->AddSolidFlags(FSOLID_NOT_SOLID);
@@ -2793,20 +2874,66 @@ ConVar cl_autohelp(
 				/*
 				while ((ent = gEntList.FindEntityByClassname(ent, "info_player_counterterrorist")) != NULL)
 				{
-					if (IsSpawnPointValid(ent, NULL))
-					{
-					}
+				if (IsSpawnPointValid(ent, NULL))
+				{
+				}
 				}*/
 
 				// Hopefully fix zombies spawning with no knives.
 				if (csplayer->WeaponCount() <= 0)
 					csplayer->GiveNamedItem("weapon_knife");
 
-				
 				player->SharedSpawn();
 				csplayer->RoundRespawn();
 
 				csplayer->SetHealth(csplayer->GetMaxHealth() / 2.5);
+
+				// TODO: Have a limit to how many specials can spawn in.
+				// Should we be special infected?
+				if (terrorstrike_use_special_infected.GetBool() && gpGlobals->curtime > m_fSpecialTime && m_iTotalSpecialsActive < m_iMaxSpecialsAllowed)
+				{
+
+					csplayer->m_IsSpecialInfected = true;
+					csplayer->m_IsSmoker = (rand() % 2 == 0);
+
+					if (csplayer->m_IsSmoker)
+					{
+						Msg("Smoker spawn.\n");
+						csplayer->SetRenderColor(252, 223, 3); // smoker.
+
+						// Some weird shit is happening where special infected are getting setback to regular ones.
+						csplayer->m_IsSpecialInfected = true;
+						csplayer->m_IsSmoker = true;
+						csplayer->m_pVoiceBox->ForceUpdate();
+						csplayer->m_pVoiceBox->SpawnNoise();
+						m_iTotalSpecialsActive++;
+					}
+					else
+					{
+						Msg("Boomer spawn.\n");
+						csplayer->SetRenderColor(252, 49, 3); // boomer. No clue what color he would of used. the footage is bad.
+
+						// Some weird shit is happening where special infected are getting setback to regular ones.
+						csplayer->m_IsSpecialInfected = true;
+						csplayer->m_IsSmoker = false;
+						csplayer->m_pVoiceBox->ForceUpdate();
+						csplayer->m_pVoiceBox->SpawnNoise();
+						m_iTotalSpecialsActive++;
+#ifdef GE_LUA
+						LuaHandle* lh = GetLuaHandle();
+						if (lh && lh->m_bLuaLoaded)
+						{
+							lua_getglobal(lh->GetLua(), "OnBoomerSpawn");
+							if (!lua_isnil(lh->GetLua(), -1)) {
+								luabridge::push(lh->GetLua(), csplayer);
+								CallLUA(lh->GetLua(), 1, 0, 0, "OnBoomerSpawn");
+							}
+						}
+#endif
+					}
+					// FIXME: This is hardcoded.
+					m_fSpecialTime = gpGlobals->curtime + m_fSpecialTimeMax;
+				}
 			}
 		}
 
@@ -2822,8 +2949,19 @@ ConVar cl_autohelp(
 		// debug stuff
 		Msg("Zombie wave time expired. Resetting\n");
 		m_bHasFirstWaveStarted = true;
+#ifdef GE_LUA
+		LuaHandle* lh = GetLuaHandle();
+		if (lh && lh->m_bLuaLoaded)
+		{
+			lua_getglobal(lh->GetLua(), "WaveRespawn");
+			if (!lua_isnil(lh->GetLua(), -1)) {
+				CallLUA(lh->GetLua(), 0, 0, 0, "WaveRespawn");
+			}
+		}
+#endif
 
 	}
+#endif
 
 	void CCSGameRules::CheckFreezePeriodExpired()
 	{
@@ -4052,6 +4190,14 @@ ConVar cl_autohelp(
 	}
 	
 #ifdef TERROR
+	void CCSGameRules::ForceZombieWaveTime(float newTime)
+	{
+		m_fZombieWaveTimeMax = newTime;
+	}
+	void CCSGameRules::SetTerrorMode(bool newState)
+	{
+		m_bIsTerrorStrike = newState;
+	}
 	bool CCSGameRules::IsNavVisibleBySurvivors(CNavArea *Target)
 	{
 		for (int o = 1; o <= gpGlobals->maxClients; ++o)
@@ -4168,14 +4314,46 @@ ConVar cl_autohelp(
 			loop_count += 1;
 		}
 
-		Msg("Found a suitable spawn after ", loop_count, " attempts..\n");
-
+		DevMsg("Found a suitable spawn after %d attempts..\n", loop_count);
 
 		if (!HasFoundArea)
 			return NULL;
 		else
 			return Output;
 	}
+
+	/*
+	static void test_navtest(void)
+	{
+		CCSPlayer *player = ToCSPlayer(UTIL_GetCommandClient());
+
+		if (player)
+		{
+			Vector *Position = CSGameRules()->GetNavmeshSpawnSpot(player);
+
+			if (Position != NULL)
+			{
+				Vector Pos = *Position;
+
+				// Only downside is this will return a valid vector even if navigation mesh fails.
+				player->Teleport(Position, &player->GetAbsAngles(), &vec3_origin);
+				player->m_Local.m_vecPunchAngle = vec3_angle;
+				player->SetAbsOrigin(Pos);
+
+				DebugDrawLine(player->GetAbsOrigin(), Pos, 0, 255, 0, true, 30.0f);
+			}
+			else
+			{
+				Msg("Complete fail. THIS IS BAD!!\n");
+			}
+		}
+		else
+		{
+			Msg("The player was null. Do not run this test command from a dedicated server!!\n");
+		}
+	}
+	static ConCommand rebuy("test_navtest", test_navtest, "Attempt to simulate a zombie respawn.");
+	*/
 #endif
 
 	// checks if the spot is clear of players
