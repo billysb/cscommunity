@@ -12,7 +12,7 @@
 #include "weapon_basecsgrenade.h"
 #include "in_buttons.h"	
 #include "datacache/imdlcache.h"
-
+#include "cs_gamerules.h"
 
 #ifdef CLIENT_DLL
 
@@ -373,6 +373,13 @@ void CBaseCSGrenade::ItemPostFrame()
 
 		m_bRedraw = true;
 		m_fThrowTime = 0.0f;
+
+#ifdef TERROR
+		if (CSGameRules()->IsTerrorStrikeMap())
+		{
+			return;
+		}
+#endif
 
 		CCSPlayer *pCSPlayer = ToCSPlayer( pPlayer );
 

@@ -11,7 +11,8 @@
 #include "weapon_csbase.h"
 #include "cs_shareddefs.h"
 #include "KeyValues.h"
-
+#ifdef PrivateBetaTest
+#endif
 
 #ifdef CLIENT_DLL
 
@@ -99,7 +100,7 @@ LINK_ENTITY_TO_CLASS(info_player_logo,CPointEntity);
 
 REGISTER_GAMERULES_CLASS( CCSGameRules );
 
-
+ // billy important
 BEGIN_NETWORK_TABLE_NOBASE( CCSGameRules, DT_CSGameRules )
 	#ifdef CLIENT_DLL
 		RecvPropBool( RECVINFO( m_bFreezePeriod ) ),
@@ -108,6 +109,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CCSGameRules, DT_CSGameRules )
 		RecvPropFloat( RECVINFO( m_flGameStartTime ) ),
 		RecvPropInt( RECVINFO( m_iHostagesRemaining ) ),
 		RecvPropBool( RECVINFO( m_bMapHasBombTarget ) ),
+		RecvPropBool( RECVINFO( m_bIsTerrorStrike ) ),
 		RecvPropBool( RECVINFO( m_bMapHasRescueZone ) ),
 		RecvPropBool( RECVINFO( m_bLogoMap ) ),
 		RecvPropBool( RECVINFO( m_bBlackMarket ) )
@@ -118,6 +120,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CCSGameRules, DT_CSGameRules )
 		SendPropFloat( SENDINFO( m_flGameStartTime ), 32, SPROP_NOSCALE ),
 		SendPropInt( SENDINFO( m_iHostagesRemaining ), 4 ),
 		SendPropBool( SENDINFO( m_bMapHasBombTarget ) ),
+		SendPropBool( SENDINFO( m_bIsTerrorStrike) ),
 		SendPropBool( SENDINFO( m_bMapHasRescueZone ) ),
 		SendPropBool( SENDINFO( m_bLogoMap ) ),
 		SendPropBool( SENDINFO( m_bBlackMarket ) )
@@ -170,7 +173,7 @@ ConVar ammo_flashbang_max( "ammo_flashbang_max", "2", FCVAR_REPLICATED );
 ConVar ammo_smokegrenade_max( "ammo_smokegrenade_max", "1", FCVAR_REPLICATED );
 
 
-#ifdef TERROR
+#ifdef SBTERROR
 ConVar terrorstrike_zombiespeed("terror_zombiespeed", "375", FCVAR_NOTIFY, "Sets the max movement speed of terror strike zombies.");
 ConVar terrorstrike_deathalerts("terror_deathsounds", "1", FCVAR_NOTIFY, "Enables player death alert sounds. Must be either 1 or 0."); //
 ConVar terrorstrike_infiniteammo("terror_infiniteammo", "1", FCVAR_NOTIFY, "Gives player ammo once fully running out"); //
@@ -181,6 +184,7 @@ ConVar terrorstrike_zombiedmg("terror_zombiedmg", "32", FCVAR_NOTIFY, "This valu
 
 // wave respawning. this gets ignored once the bomb is planted.
 ConVar terrorstrike_maxwavetime("terror_maxwavetime", "15", FCVAR_REPLICATED, "Maximum amount of time between zombie waves.");
+ConVar terrorstrike_maxrespawnzombies("terror_wavecount", "4", FCVAR_REPLICATED, "Base value of how many zombies per wave, this value is adjusted based on how many players are on the terrorist team.");
 
 // Experimental spawning
 ConVar terrorstrike_newspawning("terror_use_experimental_spawns", "1", FCVAR_REPLICATED, "Determines whether to use the new navmesh spawn system. Might have a performance hit it is new. (can be either 1 or 0)");
@@ -583,7 +587,7 @@ ConVar cl_autohelp(
 		m_iRoundTime = 0;
 		m_iRoundWinStatus = WINNER_NONE;
 		m_iFreezeTime = 0;
-#ifdef TERROR
+#ifdef SBTERROR
 		m_bZombieRespawnAllowed = true;
 		m_bHasFirstWaveStarted = false;
 
@@ -1108,7 +1112,7 @@ ConVar cl_autohelp(
 	//-----------------------------------------------------------------------------
 	void CCSGameRules::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info )
 	{
-#if TERROR
+#if SBTERROR
 		// Don't spam killfeed. Will help with lots of bots.
 		if (m_bIsTerrorStrike && pVictim->GetTeamNumber() == TEAM_CT)
 			return;
@@ -1884,7 +1888,7 @@ ConVar cl_autohelp(
 			}
 		
 			// Terrorists WON
-#ifdef TERROR
+#ifdef SBTERROR
 			if (!m_bIsTerrorStrike)
 			{
 #endif
@@ -1905,7 +1909,7 @@ ConVar cl_autohelp(
 					TerminateRound(5, Terrorists_Win);
 					return true;
 				}
-#ifdef TERROR
+#ifdef SBTERROR
 			}
 #endif
 		}
@@ -2018,9 +2022,20 @@ ConVar cl_autohelp(
 		m_iFreezeTime = mp_freezetime.GetInt();
 	}
 
+#ifdef PrivateBetaTest
+	bool CCSGameRules::CheckPlayerBetaStatus()
+	{
+		
+		return false;
+	}
+#endif
 
 	void CCSGameRules::RestartRound()
 	{
+#ifdef PrivateBetaTest
+		CheckPlayerBetaStatus();
+#endif
+
 		if ( !IsFinite( gpGlobals->curtime ) )
 		{
 			Warning( "NaN curtime in RestartRound\n" );
@@ -2168,7 +2183,7 @@ ConVar cl_autohelp(
 			m_bTCantBuy = false; 
 		}
 		
-#ifdef TERROR
+#ifdef SBTERROR
 		// Don't let zombies buy anything.
 		if (m_bIsTerrorStrike)
 			m_bCTCantBuy = true;
@@ -2363,7 +2378,7 @@ ConVar cl_autohelp(
 			if ( !pPlayer )
 				continue;
 
-#ifdef TERROR
+#ifdef SBTERROR
 			if (m_bIsTerrorStrike && pPlayer->IsBot())
 			{
 				// We disable bots ability to reset on spawn. so do it here. a dirty hack.
@@ -2375,7 +2390,7 @@ ConVar cl_autohelp(
 
 			if ( pPlayer->GetTeamNumber() == TEAM_CT && pPlayer->PlayerClass() >= FIRST_CT_CLASS && pPlayer->PlayerClass() <= LAST_CT_CLASS )
 			{
-#ifdef TERROR
+#ifdef SBTERROR
 				// Zombie wave time handles this.
 				if (!m_bIsTerrorStrike)
 				{
@@ -2401,6 +2416,13 @@ ConVar cl_autohelp(
 			if ( pPlayer->GetTeamNumber() == TEAM_TERRORIST && pPlayer->PlayerClass() >= FIRST_T_CLASS && pPlayer->PlayerClass() <= LAST_T_CLASS )
 			{
 				pPlayer->RoundRespawn();
+#ifdef SBTERROR
+				if (this->m_bIsTerrorStrike)
+				{
+					pPlayer->SetMaxHealth(300);
+					pPlayer->SetHealth(300);
+				}
+#endif
 			}
 			else
 			{
@@ -2424,7 +2446,12 @@ ConVar cl_autohelp(
 			if ( !pPlayer )
 				continue;
 
-			if ( pPlayer->GetTeamNumber() == TEAM_CT && pPlayer->PlayerClass() >= FIRST_CT_CLASS && pPlayer->PlayerClass() <= LAST_CT_CLASS )
+			// Only on normal css mode should we kick team killing.
+#ifdef SBTERROR
+			if (pPlayer->GetTeamNumber() == TEAM_CT && pPlayer->PlayerClass() >= FIRST_CT_CLASS && pPlayer->PlayerClass() <= LAST_CT_CLASS && !m_bIsTerrorStrike)
+#else
+			if (pPlayer->GetTeamNumber() == TEAM_CT && pPlayer->PlayerClass() >= FIRST_CT_CLASS && pPlayer->PlayerClass() <= LAST_CT_CLASS)
+#endif
 			{
 				pPlayer->CheckTKPunishment();
 			}
@@ -2434,7 +2461,7 @@ ConVar cl_autohelp(
 			}
 		}
 
-#ifdef TERROR
+#ifdef SBTERROR
 		// Give survivors lots of time to buy guns.
 		m_bHasFirstWaveStarted = false;
 		if (m_bIsTerrorStrike)
@@ -2572,7 +2599,7 @@ ConVar cl_autohelp(
 			pPlayer->m_iDisplayHistoryBits |= DHF_BOMB_RETRIEVED;
 			pPlayer->HintMessage( "#Hint_you_have_the_bomb", false, true );
 
-#ifdef TERROR
+#ifdef SBTERROR
 			// This fixes bomb carrier bots from standing around idle in terror strike.
 			// this is a dirty hack because we dont let the bots reset themselves properly.
 			if (m_bIsTerrorStrike && pPlayer->HasC4() && pPlayer->IsBot())
@@ -2680,7 +2707,7 @@ ConVar cl_autohelp(
 		}
 
 
-#ifdef TERROR
+#ifdef SBTERROR
 		
 		if (m_bIsTerrorStrike)
 		{
@@ -2783,7 +2810,7 @@ ConVar cl_autohelp(
 		return false;
 	}
 
-#ifdef TERROR
+#ifdef SBTERROR
 	void CCSGameRules::CheckZombieWaveTime()
 	{
 		if (!m_bZombieRespawnAllowed || gpGlobals->curtime < m_fZombieWaveTime)
@@ -2803,9 +2830,40 @@ ConVar cl_autohelp(
 			}
 		}
 
+		int Humans = UTIL_HumansOnTeam(TEAM_TERRORIST, true);
+		int max_spawns = (terrorstrike_maxrespawnzombies.GetInt());
+
+		switch (Humans)
+		{
+		case 4:
+			max_spawns = (terrorstrike_maxrespawnzombies.GetInt() + 10);
+			break;
+		case 3:
+			max_spawns = (terrorstrike_maxrespawnzombies.GetInt() + 5);
+			break;
+		case 2:
+			max_spawns = (terrorstrike_maxrespawnzombies.GetInt() + 3);
+			break;
+		case 1:
+			max_spawns = (terrorstrike_maxrespawnzombies.GetInt() + 1);
+			break;
+		default:
+			max_spawns = (terrorstrike_maxrespawnzombies.GetInt() + 10);
+			break;
+		}
+
+		int total_spawns = 0;
+
 		// Time to see if I can get away with this bullshit
 		for (int i = 1; i <= gpGlobals->maxClients; ++i)
 		{
+			
+			if (total_spawns > max_spawns)
+			{
+				//Msg("Max zombies hit!\r\n");
+				break;
+			}
+
 			CBasePlayer *player = UTIL_PlayerByIndex(i);
 			if (player == NULL)
 				continue;
@@ -2831,7 +2889,7 @@ ConVar cl_autohelp(
 				// 50% chance of using navmesh spawn.
 				if (rand() > (VALVE_RAND_MAX / 2) && m_bHasFirstWaveStarted && terrorstrike_newspawning.GetBool())
 				{
-					// Get a randm survivor
+					// Get a random survivor
 
 					Vector *NavSpawn = NULL;
 
@@ -2855,14 +2913,14 @@ ConVar cl_autohelp(
 					if (NavSpawn)
 					{
 						// Has a spawn location.
-						Msg("Navigation mesh spawn.\n");
+						//Msg("Navigation mesh spawn.\n");
 						csplayer->Teleport(NavSpawn, &csplayer->GetAbsAngles(), &vec3_origin);
 						csplayer->m_Local.m_vecPunchAngle = vec3_angle;
 					}
 					else
 					{
 						// Failed to get navmesh use normal spawning.
-						Msg("Failed to get navmesh spawn. spawning normally.\n");
+						//Msg("Failed to get navmesh spawn. spawning normally.\n");
 						GetPlayerSpawnSpot(csplayer);
 					}
 				}
@@ -2887,6 +2945,9 @@ ConVar cl_autohelp(
 				csplayer->RoundRespawn();
 
 				csplayer->SetHealth(csplayer->GetMaxHealth() / 2.5);
+				
+				// Keep track of total zombie spawns.
+				total_spawns++;
 
 				// TODO: Have a limit to how many specials can spawn in.
 				// Should we be special infected?
@@ -2898,7 +2959,7 @@ ConVar cl_autohelp(
 
 					if (csplayer->m_IsSmoker)
 					{
-						Msg("Smoker spawn.\n");
+						//Msg("Smoker spawn.\n");
 						csplayer->SetRenderColor(252, 223, 3); // smoker.
 
 						// Some weird shit is happening where special infected are getting setback to regular ones.
@@ -2910,7 +2971,7 @@ ConVar cl_autohelp(
 					}
 					else
 					{
-						Msg("Boomer spawn.\n");
+						//Msg("Boomer spawn.\n");
 						csplayer->SetRenderColor(252, 49, 3); // boomer. No clue what color he would of used. the footage is bad.
 
 						// Some weird shit is happening where special infected are getting setback to regular ones.
@@ -2947,7 +3008,7 @@ ConVar cl_autohelp(
 		}
 
 		// debug stuff
-		Msg("Zombie wave time expired. Resetting\n");
+		//Msg("Zombie wave time expired. Resetting\n");
 		m_bHasFirstWaveStarted = true;
 #ifdef GE_LUA
 		LuaHandle* lh = GetLuaHandle();
@@ -3063,7 +3124,7 @@ ConVar cl_autohelp(
 
 	void CCSGameRules::CheckRoundTimeExpired()
 	{
-#if TERROR
+#if SBTERROR
 		if (m_bIsTerrorStrike || GetRoundRemainingTime() > 0 || m_iRoundWinStatus != WINNER_NONE)
 			return; //We haven't completed other objectives, so go for this!.
 #else
@@ -3391,7 +3452,7 @@ ConVar cl_autohelp(
 		if ( targetTeam != TEAM_TERRORIST && targetTeam != TEAM_CT )
 			return;
 
-#if TERROR
+#if SBTERROR
 		// Keep humans as survivors.
 		if (m_bIsTerrorStrike)
 			targetTeam = TEAM_TERRORIST;
@@ -3406,7 +3467,7 @@ ConVar cl_autohelp(
 
 	void CCSGameRules::BalanceTeams( void )
 	{
-#if TERROR
+#if SBTERROR
 		// Don't try to do autobalance on a gamemode designed to be unbalanced lol
 		if (m_bIsTerrorStrike)
 			return;
@@ -3535,7 +3596,7 @@ ConVar cl_autohelp(
 	{
 		CheckLevelInitialized();
 
-#ifdef TERROR
+#ifdef SBTERROR
 		if (m_bIsTerrorStrike)
 			return false;
 #endif
@@ -3554,7 +3615,7 @@ ConVar cl_autohelp(
 	
 	int CCSGameRules::GetHumanTeam()
 	{
-#ifdef TERROR
+#ifdef SBTERROR
 		if (m_bIsTerrorStrike && terrorstrike_preventteam.GetBool())
 			return TEAM_TERRORIST;
 #endif
@@ -3572,7 +3633,7 @@ ConVar cl_autohelp(
 
 	int CCSGameRules::SelectDefaultTeam( bool ignoreBots /*= false*/ )
 	{
-#ifdef TERROR
+#ifdef SBTERROR
 		// Default team is survivors.
 		if (m_bIsTerrorStrike && terrorstrike_preventteam.GetBool())
 		{
@@ -3656,7 +3717,7 @@ ConVar cl_autohelp(
 		if(newTeam_id == curTeam_id)
 			return false;
 
-#ifdef TERROR
+#ifdef SBTERROR
 		// If team stacking is disabled dont check.
 		if (m_bIsTerrorStrike || mp_limitteams.GetInt() == 0)
 			return false;
@@ -3856,7 +3917,7 @@ ConVar cl_autohelp(
 				break;
 		}
 
-#ifdef TERROR
+#ifdef SBTERROR
 		// This is a dirty hack instead of adding this properly.
 		if (m_bIsTerrorStrike && iWinnerTeam == TEAM_CT)
 		{
@@ -3980,7 +4041,7 @@ ConVar cl_autohelp(
 			m_iMapHasVIPSafetyZone = 2;
 		}
 
-#ifdef TERROR
+#ifdef SBTERROR
 		const char *prefix = "maps/zombie_";
 		const char *mapname = MapName();
 
@@ -4000,8 +4061,11 @@ ConVar cl_autohelp(
 			//gpGlobals->maxClients = MAX_PLAYERS;
 			//gpGlobals->deathmatch = true; // Test hack
 
+			// Hacky things to change that make the gamemode better.
+			// TODO: Set these back to what they was for map changing back to the regular game.
+			mp_forcecamera.SetValue(0);
 			cv_bot_quota.SetValue(terrorstrike_maxzombies.GetInt()); // Limited by bot profiles.
-			cv_bot_allow_rogues.SetValue(0); // Fucking hard enough with this on.
+			cv_bot_allow_rogues.SetValue(1); // Fucking hard enough with this on.
 			engine->ServerCommand("mp_flashlight 1\n");
 			engine->ServerExecute();
 
@@ -4189,7 +4253,7 @@ ConVar cl_autohelp(
 		return pSpawnSpot;
 	}
 	
-#ifdef TERROR
+#ifdef SBTERROR
 	void CCSGameRules::ForceZombieWaveTime(float newTime)
 	{
 		m_fZombieWaveTimeMax = newTime;
@@ -4228,99 +4292,110 @@ ConVar cl_autohelp(
 		if (!TheNavMesh->IsLoaded())
 			return NULL;
 
-		CNavArea *TargetArea = TheNavMesh->GetNavArea(pTarget->GetAbsOrigin());
+		CNavArea *targetArea = TheNavMesh->GetNavArea(pTarget->GetAbsOrigin());
 
 		// Failed to grab player's area.
-		if (TargetArea == NULL)
+		if (targetArea == NULL)
 			return NULL;
 
-		Vector *Output = NULL;
-
-		// Okay now go through area connections until we find one that the player cannot see.
-		bool HasFoundArea = false;
-		int loop_count = 1;
+		Vector *output = NULL;
+		bool hasFoundArea = false;
+		int loopCount = 0;
 
 		const int MAX_AREAS_TO_TEST = 100;
-		CNavArea *AreasToTest[MAX_AREAS_TO_TEST];
+		CNavArea *areasToTest[MAX_AREAS_TO_TEST];
 		int numAreasToTest = 0;
 
-		// Add TargetArea to AreasToTest
-		AreasToTest[numAreasToTest++] = TargetArea;
+		// Add target area to areasToTest
+		areasToTest[numAreasToTest++] = targetArea;
 
-		int maxsearch = terrorstrike_max_spawn_search.GetInt();
+		int maxSearch = terrorstrike_max_spawn_search.GetInt();
 
-		while (!HasFoundArea)
+		while (!hasFoundArea && loopCount < 102 && numAreasToTest > 0)
 		{
-			// Don't freeze the game.
-			if (loop_count > 100)
-				break;
-
-			// ran out of meshes to try.
-			if (numAreasToTest == 0)
-				break;
-
-			CNavArea *CurrentAreaToTest = AreasToTest[--numAreasToTest];
+			CNavArea *currentAreaToTest = areasToTest[--numAreasToTest];
 
 			for (int d = 0; d < NUM_DIRECTIONS; d++)
 			{
-				const NavConnectVector *connectList = CurrentAreaToTest->GetAdjacentAreas((NavDirType)d);
+				const NavConnectVector *connectList = currentAreaToTest->GetAdjacentAreas((NavDirType)d);
 
 				FOR_EACH_VEC((*connectList), it)
 				{
 					NavConnect connect = (*connectList)[it];
-					if (loop_count < maxsearch)
+
+					// Check if the connected area is an immediate neighbor of the target area
+					bool isImmediateNeighbor = false;
+					for (int td = 0; td < NUM_DIRECTIONS; td++)
 					{
-						if (numAreasToTest < MAX_AREAS_TO_TEST)
+						const NavConnectVector *targetConnectList = targetArea->GetAdjacentAreas((NavDirType)td);
+						FOR_EACH_VEC((*targetConnectList), targetIt)
 						{
-							// Add connect.area to AreasToTest
-							AreasToTest[numAreasToTest++] = connect.area;
+							NavConnect targetConnect = (*targetConnectList)[targetIt];
+							if (connect.area == targetConnect.area)
+							{
+								isImmediateNeighbor = true;
+								break;
+							}
 						}
+						if (isImmediateNeighbor)
+							break;
 					}
-					else
+
+					// Skip if it's the target area itself or an immediate neighbor
+					if (connect.area == targetArea || isImmediateNeighbor)
+						continue;
+
+					if (loopCount < maxSearch)
 					{
 						// Now start testing for potential spawns.
 						if (!IsNavVisibleBySurvivors(connect.area))
 						{
-							// Hurray we have a spawn! Now figure out a valid position in 3D space.....
-
 							// Get a random point on the nav mesh. We should try this a few times.
 							int attempts = 0;
 
 							while (attempts < 5)
 							{
-								Vector RandomSpawn = connect.area->GetRandomPoint();
+								Vector randomSpawn = connect.area->GetRandomPoint();
 
 								Vector mins = GetViewVectors()->m_vHullMin;
 								Vector maxs = GetViewVectors()->m_vHullMax;
 
-								Vector vTestMins = RandomSpawn + mins;
-								Vector vTestMaxs = RandomSpawn + maxs;
+								Vector vTestMins = randomSpawn + mins;
+								Vector vTestMaxs = randomSpawn + maxs;
 
-								// using out target to check space is empty seems bad.
-								if (UTIL_IsSpaceEmpty(pTarget, mins, maxs))
+								// Using our target to check space is empty seems bad.
+								if (UTIL_IsSpaceEmpty(pTarget, vTestMins, vTestMaxs))
 								{
-									Output = new Vector(RandomSpawn.x, RandomSpawn.y, RandomSpawn.z);
-									HasFoundArea = true;
+									output = new Vector(randomSpawn.x, randomSpawn.y, randomSpawn.z);
+									hasFoundArea = true;
 									break;
 								}
 
-								attempts += 1;
+								attempts++;
 							}
+
+							if (hasFoundArea)
+								break;
 						}
 					}
 				}
+
+				if (hasFoundArea)
+					break;
 			}
 
-			loop_count += 1;
+			loopCount++;
 		}
 
-		DevMsg("Found a suitable spawn after %d attempts..\n", loop_count);
+		//DevMsg("Found a suitable spawn after %d attempts..\n", loopCount);
 
-		if (!HasFoundArea)
+		if (!hasFoundArea)
 			return NULL;
 		else
-			return Output;
+			return output;
 	}
+
+
 
 	/*
 	static void test_navtest(void)
@@ -4658,7 +4733,7 @@ bool CCSGameRules::IsVIPMap() const
 	return false;
 }
 
-#ifdef TERROR
+#ifdef SBTERROR
 bool CCSGameRules::IsTerrorStrikeMap() const
 {
 	return m_bIsTerrorStrike;
@@ -4743,6 +4818,7 @@ CAmmoDef* GetAmmoDef()
 		ammoDef.AddAmmoType( BULLET_PLAYER_357SIG,		DMG_BULLET, TRACER_LINE, 0, 0, "ammo_357sig_max",	2000 * BULLET_IMPULSE_EXAGGERATION, 0, 4, 8 );
 		ammoDef.AddAmmoType( BULLET_PLAYER_57MM,		DMG_BULLET, TRACER_LINE, 0, 0, "ammo_57mm_max",		2000 * BULLET_IMPULSE_EXAGGERATION, 0, 4, 8 );
 		ammoDef.AddAmmoType( AMMO_TYPE_HEGRENADE,		DMG_BLAST,	TRACER_LINE, 0, 0,	1/*max carry*/, 1, 0 );
+		ammoDef.AddAmmoType( AMMO_TYPE_MOLOTOV,			DMG_BURN,   TRACER_LINE, 0, 0,  1/*max carry*/, 1, 0);
 		ammoDef.AddAmmoType( AMMO_TYPE_FLASHBANG,		0,			TRACER_LINE, 0,	0,	2/*max carry*/, 1, 0 );
 		ammoDef.AddAmmoType( AMMO_TYPE_SMOKEGRENADE,	0,			TRACER_LINE, 0, 0,	1/*max carry*/, 1, 0 );
 
@@ -4781,7 +4857,7 @@ const char *CCSGameRules::GetChatPrefix( bool bTeamOnly, CBasePlayer *pPlayer )
 			{
 				if (pPlayer->m_lifeState == LIFE_ALIVE)
 				{
-#ifdef TERROR
+#ifdef SBTERROR
 					// FIXME: Does not work because of language files being used instead.
 					if (m_bIsTerrorStrike)
 						pszPrefix = "(Zombie)";
@@ -4793,7 +4869,7 @@ const char *CCSGameRules::GetChatPrefix( bool bTeamOnly, CBasePlayer *pPlayer )
 				}
 				else
 				{
-#ifdef TERROR
+#ifdef SBTERROR
 					// FIXME: Does not work because of language files being used instead.
 					if (m_bIsTerrorStrike)
 						pszPrefix = "*DEAD*(Zombie)";
@@ -4808,7 +4884,7 @@ const char *CCSGameRules::GetChatPrefix( bool bTeamOnly, CBasePlayer *pPlayer )
 			{
 				if (pPlayer->m_lifeState == LIFE_ALIVE)
 				{
-#ifdef TERROR
+#ifdef SBTERROR
 					// FIXME: Does not work because of language files being used instead.
 					if (m_bIsTerrorStrike)
 						pszPrefix = "(Survivor)";
@@ -4820,7 +4896,7 @@ const char *CCSGameRules::GetChatPrefix( bool bTeamOnly, CBasePlayer *pPlayer )
 				}
 				else
 				{
-#ifdef TERROR
+#ifdef SBTERROR
 					// FIXME: Does not work because of language files being used instead.
 					if (m_bIsTerrorStrike)
 						pszPrefix = "*DEAD*(Survivor)";
@@ -5023,7 +5099,7 @@ bool CCSGameRules::FAllowNPCs( void )
 
 bool CCSGameRules::IsFriendlyFireOn( void )
 {
-#ifdef TERROR
+#ifdef SBTERROR
 	// This seems to get ignored.
 	if (m_bIsTerrorStrike)
 		return true;
@@ -5034,7 +5110,7 @@ bool CCSGameRules::IsFriendlyFireOn( void )
 #endif
 }
 
-#ifdef TERROR
+#ifdef SBTERROR
 
 /*
  A very shitty attempt at implementing a game director.
@@ -5146,7 +5222,7 @@ void CreateBlackMarketString( void )
 
 int CCSGameRules::GetStartMoney( void )
 {
-#if TERROR
+#if SBTERROR
 	if (m_bIsTerrorStrike)
 		return 30000;
 #endif

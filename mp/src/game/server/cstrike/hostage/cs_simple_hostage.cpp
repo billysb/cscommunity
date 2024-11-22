@@ -876,7 +876,7 @@ void CHostage::HostageUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 		return;
 	}
 
-#ifdef TERROR
+#ifdef SBTERROR
 	
 	// In Terror Strike zombies cannot move the hostages.
 
@@ -938,7 +938,7 @@ void CHostage::HostageUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 	{
 		m_hasBeenUsed = true;
 
-#ifdef TERROR
+#ifdef SBTERROR
 		if (!CSGameRules()->IsTerrorStrikeMap())
 			GiveCTUseBonus( user );
 #else

@@ -335,7 +335,7 @@ void CCSBot::ResetValues( void )
 		m_enemyQueue[i].isProtectedByShield = false;
 	}
 
-#ifdef TERROR
+#ifdef SBTERROR
 	m_iStuckCounter = 0;
 #endif
 
@@ -356,7 +356,7 @@ void CCSBot::Spawn(void)
 	// do the normal player spawn process
 	BaseClass::Spawn();
 
-#ifdef TERROR
+#ifdef SBTERROR
 	CCSBotManager *ctrl = static_cast<CCSBotManager *>(TheBots);
 	// Dirty hack because this breaks us on terror strike when we respawn.
 

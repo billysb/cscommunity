@@ -49,9 +49,15 @@ void PlantBombState::OnUpdate( CCSBot *me )
 
 	// if we aren't holding the C4, grab it, otherwise plant it
 	if (holdingC4)
+	{
 		me->PrimaryAttack();
+	}
 	else
-		me->SelectItem( "weapon_c4" );
+	{
+		// Billy change. undo if it breaks shit.
+		me->SelectItem("weapon_c4");
+		me->PrimaryAttack();
+	}
 
 	// if we no longer have the C4, we've successfully planted
 	if (!me->HasC4())

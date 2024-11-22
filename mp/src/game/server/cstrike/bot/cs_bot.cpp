@@ -63,7 +63,7 @@ int GetBotFollowCount( CCSPlayer *leader )
  */
 void CCSBot::Walk( void )
 {
-#ifdef TERROR
+#ifdef SBTERROR
 	if (CSGameRules()->IsTerrorStrikeMap())
 	{
 		Run();
@@ -398,7 +398,7 @@ void CCSBot::BotDeathThink( void )
  */
 void CCSBot::TryToJoinTeam( int team )
 {
-#ifdef TERROR
+#ifdef SBTERROR
 	// If terror strike hack our morale to be excellent by default.
 	if (CSGameRules()->IsTerrorStrikeMap())
 	{
@@ -447,7 +447,7 @@ bool CCSBot::StayOnNavMesh( void )
 			goalArea = TheNavMesh->GetNearestNavArea( GetCentroid( this ) );
 			PrintIfWatched( "Started off the nav mesh - moving to closest nav area...\n" );
 
-#ifdef TERROR
+#ifdef SBTERROR
 			// For some reason this gets stuck in a loop on terror strike. Lets try a dirty hack.
 			// Make the bot believe it is on the area even if it isnt. Most of the anti stucck code will fix this.
 			m_currentArea = goalArea;
@@ -811,7 +811,7 @@ void CCSBot::IncreaseMorale( void )
  */
 void CCSBot::DecreaseMorale( void )
 {
-#ifdef TERROR
+#ifdef SBTERROR
 	if (CSGameRules()->IsTerrorStrikeMap())
 	{
 		// Bots in terror-strike shouldnt hide. Low morale means constant hiding from enemies.
@@ -1194,7 +1194,7 @@ void CCSBot::BuildUserCmd( CUserCmd& cmd, const QAngle& viewangles, float forwar
 	if ( !RunMimicCommand( cmd ) )
 	{
 		// Don't walk when ducked - it's painfully slow
-#ifdef TERROR
+#ifdef SBTERROR
 		// Walking is not helpful in terror strike as a bot.
 		if (m_Local.m_bDucked || m_Local.m_bDucking || CSGameRules()->IsTerrorStrikeMap())
 #else

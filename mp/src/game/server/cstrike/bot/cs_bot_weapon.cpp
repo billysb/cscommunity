@@ -473,7 +473,7 @@ void CCSBot::EquipBestWeapon( bool mustEquip )
 
 	CCSBotManager *ctrl = static_cast<CCSBotManager *>( TheBots );
 	
-#ifdef TERROR
+#ifdef SBTERROR
 	// Hacky solution to pass gamerules variable.
 	if (ctrl->IsTerrorStrike() && GetTeamNumber() == TEAM_CT)
 	{

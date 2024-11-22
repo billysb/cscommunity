@@ -45,7 +45,7 @@ public:
 		m_reactionTime = 0.3f;
 		m_attackDelay = 0.0f;
 		m_teams = TEAM_UNASSIGNED;
-		m_voice = (char *)'0';
+		m_voice = NULL;
 		m_voiceBank = 0;
 		m_prefersSilencer = false;
 	}

@@ -114,6 +114,7 @@ public:
 	void ItemPostFrame();
 	virtual void PrimaryAttack();
 	virtual void WeaponIdle();
+	void DoMuzzleFlash();
 	virtual void UpdateShieldState( void );
 
 	virtual CSWeaponID GetWeaponID( void ) const		{ return WEAPON_C4; }

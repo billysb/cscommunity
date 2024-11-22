@@ -124,7 +124,7 @@ CCSBotManager::CCSBotManager()
 	TheBotProfiles = new BotProfileManager;
 }
 
-#ifdef TERROR
+#ifdef SBTERROR
 bool CCSBotManager::IsTerrorStrike(void)
 {
 	return CSGameRules()->IsTerrorStrikeMap();
@@ -962,7 +962,7 @@ bool CCSBotManager::BotAddCommand( int team, bool isFromConsole, const char *pro
 				team = TEAM_CT;
 			else
 				team = CSGameRules()->SelectDefaultTeam();
-#ifdef TERROR
+#ifdef SBTERROR
 			// I wanna be a zombie.
 			if (CSGameRules()->IsTerrorStrikeMap())
 			{
@@ -1012,7 +1012,7 @@ bool CCSBotManager::BotAddCommand( int team, bool isFromConsole, const char *pro
 				team = TEAM_CT;
 			else
 				team = CSGameRules()->SelectDefaultTeam();
-#ifdef TERROR
+#ifdef SBTERROR
 			// I wanna be a zombie.
 			if (CSGameRules()->IsTerrorStrikeMap())
 			{
@@ -1224,7 +1224,7 @@ void CCSBotManager::MaintainBotQuota( void )
 	{
 		if ( CSGameRules()->GetRoundElapsedTime() < 20.0f ) // new bots can still spawn during this time
 		{
-#ifdef TERROR
+#ifdef SBTERROR
 			// Autobalance will fuck up terror strike so ignore it.
 			// Bots will never balance on terror strike for obvious reasons..
 			if (mp_autoteambalance.GetBool() && !CSGameRules()->IsTerrorStrikeMap())
@@ -1259,7 +1259,7 @@ void CCSBotManager::MaintainBotQuota( void )
 	// add bots if necessary
 	if (desiredBotCount > botsInGame)
 	{
-#ifdef TERROR
+#ifdef SBTERROR
 		// don't try to add a bot if all teams are full
 		if (!CSGameRules()->TeamFull(TEAM_TERRORIST) || !CSGameRules()->TeamFull(TEAM_CT))
 			TheCSBots()->BotAddCommand(TEAM_UNASSIGNED);

@@ -204,6 +204,7 @@ $Project "Server"
 				$File	"CZVoiceBox.cpp"
 				$File	"CZVoiceBox.h"
 				$File	"terror_smokersmoke.cpp"
+				$File	"terror_firefloor.cpp"
 			}
 			$Folder	"Bot"
 			{

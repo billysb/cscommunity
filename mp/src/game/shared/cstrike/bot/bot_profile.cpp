@@ -175,6 +175,7 @@ void BotProfileManager::Init( const char *filename, unsigned int *checksum )
 		bool isTemplate = (!stricmp( token, "Template" ));
 		bool isCustomSkin = (!stricmp( token, "Skin" ));
 
+
 		if ( isCustomSkin )
 		{
 			const int BufLen = 64;
@@ -321,7 +322,6 @@ void BotProfileManager::Init( const char *filename, unsigned int *checksum )
 			}
 		}
 
-
 		// get name of this profile
 		if (!isDefault)
 		{
@@ -426,10 +426,10 @@ void BotProfileManager::Init( const char *filename, unsigned int *checksum )
 			}
 			else if (!stricmp("Voice", attributeName))
 			{
-				if (profile->m_name)
-					delete profile->m_name;
+				if (profile->m_voice)
+					delete profile->m_voice;
 
-				profile->m_name = token;
+				profile->m_voice = CloneString(token);
 			}
 			else if (!stricmp( "VoiceBank", attributeName ))
 			{
@@ -513,6 +513,7 @@ void BotProfileManager::Init( const char *filename, unsigned int *checksum )
 				CONSOLE_ECHO( "Error parsing %s - unknown attribute '%s'\n", filename, attributeName );
 			}
 		}
+
 
 		if (!isDefault)
 		{

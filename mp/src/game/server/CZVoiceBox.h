@@ -17,6 +17,8 @@ public:
 	CZVoiceBox(CCSPlayer* me);
 
 
+	void GetHumanName(void);
+
 	void SpawnNoise(void);
 	void DeathNoise(void);
 	void PainNoise(void);
@@ -37,6 +39,20 @@ public:
 private:
 
 	CCSPlayer* m_hOwner;
+
+	// human stuff.
+	char* character;
+
+	// Am I human?
+	bool m_bIsHuman;
+
+	// Represent how bad health is for specific health related lines.
+	short m_sHealthState;
+	
+	float m_fLastAttackerTime;
+
+	// Humans will track how many attackers surround them
+	int m_attackers;
 
 	bool	m_bIsAngry;
 	bool	m_bIsSpecial;

@@ -17,7 +17,7 @@
 #include "cs_autobuy.h"
 #include "utldict.h"
 
-#ifdef TERROR
+#ifdef SBTERROR
 #include "CZVoiceBox.h"
 #endif
 
@@ -229,7 +229,7 @@ public:
 	virtual int			OnTakeDamage( const CTakeDamageInfo &inputInfo );
 	virtual int			OnTakeDamage_Alive( const CTakeDamageInfo &info );
 
-#ifdef TERROR
+#ifdef SBTERROR
 
 	virtual void CCSPlayer::Event_Dying();
 #endif
@@ -337,7 +337,7 @@ public:
 	// Reset account, get rid of shield, etc..
 	void Reset();
 
-#ifdef TERROR
+#ifdef SBTERROR
 	// Used by zombies.
 	bool m_bIsAngry;
 
@@ -471,7 +471,7 @@ public:
 	void State_Transition( CSPlayerState newState );	// Cleanup the previous state and enter a new state.
 	CSPlayerState State_Get() const;				// Get the current state.
 
-#ifdef TERROR
+#ifdef SBTERROR
 	bool IsZombie(void);
 	CZVoiceBox* m_pVoiceBox;
 #endif
@@ -534,7 +534,7 @@ private:
 
 public:
 
-#ifdef TERROR
+#ifdef SBTERROR
 	// Only 2 special infecteds for now.
 	bool m_IsSpecialInfected;
 	bool m_IsSmoker;

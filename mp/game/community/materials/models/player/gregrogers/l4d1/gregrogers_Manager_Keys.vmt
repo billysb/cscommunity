@@ -1,0 +1,17 @@
+VertexLitGeneric
+{
+	$baseTexture "models/player/gregrogers/l4d1/gregrogers_manager_hair"
+	$bumpmap "models/player/gregrogers/l4d1/gregrogers_manager_hair_nrml"
+	$color2 "[.8 .8 .8]"
+	$alphatest 1
+//	$translucent 1
+	$lightwarptexture "models/player/gregrogers/gregrogers_lightwarp_minimalistic"
+	$phong 1
+	$phongboost 900
+//	$phongtint "[.85 .85 1]"
+	$phongexponent 2.5
+	$phongfresnelranges "[.010 .010 .155]"
+	$phongalbedotint "1"
+	$phongexponenttexture "models/player/gregrogers/gregrogers_explight2"
+	$normalmapalphaphongmask 1
+}

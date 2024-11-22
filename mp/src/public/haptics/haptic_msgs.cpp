@@ -13,7 +13,7 @@
 	#include "prediction.h"
 	#include "activitylist.h"
 #ifdef TERROR
-	#include "ClientTerrorPlayer.h"
+	//#include "ClientTerrorPlayer.h"
 #endif
 extern vgui::IInputInternal *g_InputInternal;
 #else

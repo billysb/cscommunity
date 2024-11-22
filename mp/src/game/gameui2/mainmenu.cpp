@@ -59,6 +59,7 @@ void MainMenu::CreateMenu(const char* MenuScript)
 	DataFile->UsesEscapeSequences(true);
 	if (DataFile->LoadFromFile(g_pFullFileSystem, MenuScript) == true)
 	{
+
 		for (KeyValues* Data = DataFile->GetFirstSubKey(); Data != nullptr; Data = Data->GetNextKey())
 		{
 			Button_MainMenu* Button = new Button_MainMenu(this, this, Data->GetString("command", ""));

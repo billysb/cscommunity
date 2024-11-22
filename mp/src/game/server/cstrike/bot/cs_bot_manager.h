@@ -129,7 +129,7 @@ public:
 	virtual bool ServerCommand( const char *cmd );
 	bool IsServerActive( void ) const { return m_serverActive; }
 
-#ifdef TERROR
+#ifdef SBTERROR
 	bool CCSBotManager::IsTerrorStrike(void);
 #endif
 

@@ -23,7 +23,7 @@
 Vector head_hull_mins( -16, -16, -18 );
 Vector head_hull_maxs( 16, 16, 18 );
 
-#ifdef TERROR
+#ifdef SBTERROR
 extern ConVar terrorstrike_zombiedmg;
 #endif
 
@@ -418,7 +418,7 @@ bool CKnife::SwingOrStab( bool bStab )
 		
 		float flDamage = 42.0f;
 
-#ifdef TERROR
+#ifdef SBTERROR
 		bool IsTerror = CSGameRules()->IsTerrorStrikeMap();
 		if (IsTerror && GetOwnerEntity()->GetTeamNumber() == TEAM_CT)
 			flDamage = flDamage / terrorstrike_zombiedmg.GetFloat();
@@ -428,7 +428,7 @@ bool CKnife::SwingOrStab( bool bStab )
 		{
 			flDamage = 65.0f;
 
-#ifdef TERROR
+#ifdef SBTERROR
 			if (IsTerror && GetOwnerEntity()->GetTeamNumber() == TEAM_CT)
 				flDamage = flDamage / (terrorstrike_zombiedmg.GetFloat() * 2);
 #endif
@@ -444,7 +444,7 @@ bool CKnife::SwingOrStab( bool bStab )
 
 				float flDot = vecLOS.Dot( vTragetForward.AsVector2D() );
 
-#ifdef TERROR
+#ifdef SBTERROR
 				// Back damage should only be boosted outside of terror strike.
 				if (!IsTerror)
 				{
@@ -471,7 +471,7 @@ bool CKnife::SwingOrStab( bool bStab )
 				// subsequent swings do less	
 				flDamage = 15;
 			}
-#ifdef TERROR
+#ifdef SBTERROR
 			if (CSGameRules()->IsTerrorStrikeMap())
 				flDamage = flDamage / 2;
 #endif

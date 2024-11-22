@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+$baseTexture "models\infected\boomer/Boomer_Hair"
+$alphatest 1
+$allowalphatocoverage 1
+$nocull 1
+}

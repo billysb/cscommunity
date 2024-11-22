@@ -495,7 +495,7 @@ void CCSBot::StuckCheck( void )
 				}
 
 				m_isStuck = true;
-#ifdef TERROR
+#ifdef SBTERROR
 				CCSBotManager *ctrl = static_cast<CCSBotManager *>(TheBots);
 
 				if (ctrl->IsTerrorStrike())

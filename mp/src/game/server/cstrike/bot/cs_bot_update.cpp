@@ -18,7 +18,7 @@
 //-----------------------------------------------------------------------------------------------------------
 float CCSBot::GetMoveSpeed( void )
 {
-#ifdef TERROR
+#ifdef SBTERROR
 	if (CSGameRules()->IsTerrorStrikeMap() && GetTeamNumber() == TEAM_CT)
 	{
 		return 375.0f;
@@ -256,7 +256,7 @@ void CCSBot::Update( void )
 	Vector myOrigin = GetCentroid( this );
 
 	// if we are spectating, get into the game
-#ifdef TERROR
+#ifdef SBTERROR
 	if (GetTeamNumber() == 0)
 	{
 		if (CSGameRules()->IsTerrorStrikeMap())
@@ -673,7 +673,7 @@ void CCSBot::Update( void )
 				GetGameState()->IsPlantedBombLocationKnown() &&			// we know where the bomb is
 				TheCSBots()->GetBombTimeLeft() < gonnaBlowTime &&		// is the bomb about to explode
 				!IsDefusingBomb() &&									// we aren't defusing the bomb
-#ifdef TERROR
+#ifdef SBTERROR
 				!IsAttacking() &&										// we aren't in the midst of a firefight
 				!CSGameRules()->IsTerrorStrikeMap()						// Is not terror strike.
 #else

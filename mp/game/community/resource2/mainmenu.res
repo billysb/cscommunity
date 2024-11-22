@@ -54,14 +54,14 @@
 		"specifics"		"shared"
 	}
 	
-	"ReportBug"
-	{
-		"text"			"#GameUI2_ReportBug"
-		"description"	"#GameUI2_ReportBugDescription"
-		"command"		"cvar bug"
-		"priority"		"7"
-		"specifics"		"shared"
-	}
+	//"ReportBug"
+	//{
+	//	"text"			"#GameUI2_ReportBug"
+	//	"description"	"#GameUI2_ReportBugDescription"
+	//	"command"		"cvar bug"
+	//	"priority"		"7"
+	//	"specifics"		"shared"
+	//}
 	
 	"Benchmark"
 	{

@@ -58,12 +58,91 @@ void CCSClassImagePanel::Paint()
 
 
 // ----------------------------------------------------------------------------- //
+// CClassMenu_SURV
+// ----------------------------------------------------------------------------- //
+
+CClassMenu_SURV::CClassMenu_SURV(IViewPort *pViewPort) : CClassMenu(pViewPort, PANEL_CLASS_SURV)
+{
+	LoadControlSettings("Resource/UI/ClassMenu_SURV.res");
+	CreateBackground(this);
+	m_backgroundLayoutFinished = false;
+}
+
+const char *CClassMenu_SURV::GetName(void)
+{
+	return PANEL_CLASS_SURV;
+}
+
+void CClassMenu_SURV::ShowPanel(bool bShow)
+{
+	if (bShow)
+	{
+		engine->CheckPoint("ClassMenu");
+	}
+
+	BaseClass::ShowPanel(bShow);
+
+}
+
+void CClassMenu_SURV::SetVisible(bool state)
+{
+	BaseClass::SetVisible(state);
+
+	if (state)
+	{
+		Panel *pAutoButton = FindChildByName("autoselect_t");
+		if (pAutoButton)
+		{
+			pAutoButton->RequestFocus();
+		}
+	}
+}
+
+bool modelExists(const char *search, const CUtlVector< const char * > &names)
+{
+	for (int i = 0; i<names.Count(); ++i)
+	{
+		if (Q_stristr(names[i], search) != NULL)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void CClassMenu_SURV::Update()
+{
+	C_CSPlayer *pLocalPlayer = C_CSPlayer::GetLocalCSPlayer();
+
+	if (pLocalPlayer && pLocalPlayer->PlayerClass() >= FIRST_T_CLASS && pLocalPlayer->PlayerClass() <= LAST_T_CLASS)
+	{
+		SetVisibleButton("CancelButton", true);
+	}
+	else
+	{
+		SetVisibleButton("CancelButton", false);
+	}
+}
+
+
+Panel *CClassMenu_SURV::CreateControlByName(const char *controlName)
+{
+	if (Q_stricmp(controlName, "CSClassImagePanel") == 0)
+	{
+		return new CCSClassImagePanel(NULL, controlName);
+	}
+
+	return BaseClass::CreateControlByName(controlName);
+}
+
+// ----------------------------------------------------------------------------- //
 // CClassMenu_TER
 // ----------------------------------------------------------------------------- //
 
 CClassMenu_TER::CClassMenu_TER(IViewPort *pViewPort) : CClassMenu(pViewPort, PANEL_CLASS_TER)
 {
-	LoadControlSettings( "Resource/UI/ClassMenu_TER.res" );
+	LoadControlSettings("Resource/UI/ClassMenu_TER.res");
 	CreateBackground( this );
 	m_backgroundLayoutFinished = false;
 }
@@ -96,19 +175,6 @@ void CClassMenu_TER::SetVisible(bool state)
 			pAutoButton->RequestFocus();
 		}
 	}
-}
-
-bool modelExists( const char *search, const CUtlVector< const char * > &names )
-{
-	for ( int i=0; i<names.Count(); ++i )
-	{
-		if ( Q_stristr( names[i], search ) != NULL )
-		{
-			return true;
-		}
-	}
-
-	return false;
 }
 
 void CClassMenu_TER::Update()
@@ -209,6 +275,37 @@ void CClassMenu_CT::Update()
 	// if we don't have the new models installed,
 	// turn off the militia and spetsnaz buttons
 	SetVisibleButton( "spetsnaz", false );
+}
+
+
+
+//-----------------------------------------------------------------------------
+// Purpose: The CS background is painted by image panels, so we should do nothing
+//-----------------------------------------------------------------------------
+void CClassMenu_SURV::PaintBackground()
+{
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Scale / center the window
+//-----------------------------------------------------------------------------
+void CClassMenu_SURV::PerformLayout()
+{
+	BaseClass::PerformLayout();
+
+	// stretch the window to fullscreen
+	if (!m_backgroundLayoutFinished)
+		LayoutBackgroundPanel(this);
+	m_backgroundLayoutFinished = true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CClassMenu_SURV::ApplySchemeSettings(vgui::IScheme *pScheme)
+{
+	BaseClass::ApplySchemeSettings(pScheme);
+	ApplyBackgroundSchemeSettings(this, pScheme);
 }
 
 

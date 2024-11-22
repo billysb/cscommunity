@@ -19,6 +19,9 @@
 #include <game/client/iviewport.h>
 
 // CS-specific viewport panels
+#ifdef SBTERROR
+#define PANEL_CLASS_SURV			"class_surv"
+#endif
 #define PANEL_CLASS_CT				"class_ct"
 #define PANEL_CLASS_TER				"class_ter"
 
@@ -47,7 +50,9 @@ public:
 
 extern CUtlVectorInitialized< const char * > CTPlayerModels;
 extern CUtlVectorInitialized< const char * > TerroristPlayerModels;
-
+#ifdef SBTERROR
+extern CUtlVectorInitialized< const char * > SurvivorPlayerModels;
+#endif
 
 // These go in CCSPlayer::m_iAddonBits and get sent to the client so it can create
 // grenade models hanging off players.

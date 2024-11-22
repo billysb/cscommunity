@@ -54,7 +54,7 @@
 #include "cs_gamestats.h"
 #include "gamestats.h"
 
-#ifdef TERROR
+#ifdef SBTERROR
 // This is pretty awful, really we should use the CBaseEntity class as much as possible.
 #include "hegrenade_projectile.h"
 #include "smokegrenade_projectile.h"
@@ -86,7 +86,7 @@ ConVar bot_mimic_yaw_offset( "bot_mimic_yaw_offset", "180", FCVAR_CHEAT );
 extern ConVar mp_autokick;
 extern ConVar sv_turbophysics;
 
-#ifdef TERROR
+#ifdef SBTERROR
 extern ConVar terrorstrike_usemodels;
 extern ConVar terrorstrike_deathalerts;
 extern ConVar terrorstrike_infiniteammo;
@@ -361,7 +361,7 @@ ConCommand cc_CreatePredictionError( "CreatePredictionError", cc_CreatePredictio
 
 CCSPlayer::CCSPlayer()
 {
-#ifdef TERROR
+#ifdef SBTERROR
 	// Give us a voicebox.
 	if (CSGameRules()->IsTerrorStrikeMap())
 		m_pVoiceBox = new CZVoiceBox(this);
@@ -437,7 +437,7 @@ CCSPlayer::CCSPlayer()
 
 CCSPlayer::~CCSPlayer()
 {
-#ifdef TERROR
+#ifdef SBTERROR
 	if (m_pVoiceBox)
 		delete m_pVoiceBox;
 #endif
@@ -456,7 +456,7 @@ CCSPlayer *CCSPlayer::CreatePlayer( const char *className, edict_t *ed )
 	return (CCSPlayer*)CreateEntityByName( className );
 }
 
-#ifdef TERROR
+#ifdef SBTERROR
 bool CCSPlayer::IsZombie()
 {
 	// Advanced fucking zombie detection code right here.
@@ -480,6 +480,16 @@ void CCSPlayer::Precache()
 		PrecacheModel( TerroristPlayerModels[i] );
 		engine->ForceModelBounds( TerroristPlayerModels[i], mins, maxs );
 	}
+#ifdef SBTERROR
+	if (CSGameRules()->IsTerrorStrikeMap())
+	{
+		for (i = 0; i < SurvivorPlayerModels.Count(); ++i)
+		{
+			PrecacheModel(SurvivorPlayerModels[i]);
+			engine->ForceModelBounds(SurvivorPlayerModels[i], mins, maxs);
+		}
+	}
+#endif
 
 	// Sigh - have to force identical VMTs for the player models.  I'm just going to hard-code these
 	// strings here, rather than have char***'s or the CUtlVector<CUtlVector<>> equivalent.
@@ -523,7 +533,7 @@ void CCSPlayer::Precache()
 
 	PrecacheModel ( "sprites/glow01.vmt" );
 
-#ifdef TERROR
+#ifdef SBTERROR
 	if (CSGameRules()->IsTerrorStrikeMap())
 	{
 		// Testing gibbing for the boomer.
@@ -694,15 +704,40 @@ void CCSPlayer::InitialSpawn( void )
 
 void CCSPlayer::SetModelFromClass( void )
 {
-	if ( GetTeamNumber() == TEAM_TERRORIST )
+	if (GetTeamNumber() == TEAM_TERRORIST)
 	{
 		int index = m_iClass - FIRST_T_CLASS;
+#ifdef SBTERROR
+		// billy survivor
+		if (CSGameRules()->IsTerrorStrikeMap() && index < 0 || index >= SurvivorPlayerModels.Count())
+		{
+			index = RandomInt(0, SurvivorPlayerModels.Count() - 1);
+			m_iClass = index + FIRST_T_CLASS; // clean up players who selected a higher class than we support yet
+		}
+		else if (index < 0 || index >= TerroristPlayerModels.Count())
+		{
+			index = RandomInt(0, TerroristPlayerModels.Count() - 1);
+			m_iClass = index + FIRST_T_CLASS; // clean up players who selected a higher class than we support yet
+		}
+#else
 		if ( index < 0 || index >= TerroristPlayerModels.Count() )
 		{
 			index = RandomInt( 0, TerroristPlayerModels.Count() - 1 );
 			m_iClass = index + FIRST_T_CLASS; // clean up players who selected a higher class than we support yet
 		}
-		SetModel( TerroristPlayerModels[index] );
+#endif
+#ifdef SBTERROR
+		if (CSGameRules()->IsTerrorStrikeMap())
+		{
+			SetModel(SurvivorPlayerModels[index]);
+		}
+		else
+		{
+			SetModel(TerroristPlayerModels[index]);
+		}
+#else
+		SetModel(TerroristPlayerModels[index]);
+#endif
 	}
 	else if ( GetTeamNumber() == TEAM_CT )
 	{
@@ -743,7 +778,7 @@ void CCSPlayer::Spawn()
 	// Our player movement speed is set once here. This will override the cl_xxxx
 	// cvars unless they are set to be lower than this.
 	//
-#ifdef TERROR
+#ifdef SBTERROR
 	// Terror strike specific fixes for special infected: Make sure this is ready for when we need it.
 	m_bDiedHackFix = true;
 	m_bShouldRagdoll = true;
@@ -848,7 +883,7 @@ void CCSPlayer::Spawn()
 
 	StockPlayerAmmo();
 
-#ifdef TERROR
+#ifdef SBTERROR
 	// Fixed typo. This should only work for counter terrorists AKA the zombies.
 	if (CSGameRules()->IsTerrorStrikeMap() && terrorstrike_usemodels.GetBool() && GetTeamNumber() == TEAM_CT)
 	{
@@ -927,7 +962,7 @@ void CCSPlayer::GiveDefaultItems()
 	if ( GetTeamNumber() == TEAM_CT )
 	{
 		GiveNamedItem( "weapon_knife" );
-#ifdef TERROR
+#ifdef SBTERROR
 		if (!CSGameRules()->IsTerrorStrikeMap())
 		{
 			GiveNamedItem( "weapon_usp" );
@@ -984,12 +1019,13 @@ int CCSPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 
 	// don't apply damage forces in CS
 
-#ifdef TERROR
+#ifdef SBTERROR
 	if (IsZombie())
 		m_pVoiceBox->PainNoise();
 #endif
 
 	// fire global game event
+	CBaseEntity * attacker = info.GetAttacker();
 
 	IGameEvent * event = gameeventmanager->CreateEvent( "player_hurt" );
 
@@ -1011,7 +1047,6 @@ int CCSPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			event->SetInt( "hitgroup", m_LastHitGroup );
 		}
 
-		CBaseEntity * attacker = info.GetAttacker();
 		const char *weaponName = "";
 
 		if ( attacker->IsPlayer() )
@@ -1067,7 +1102,7 @@ int CCSPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	return 1;
 }
 
-#ifdef TERROR
+#ifdef SBTERROR
 void CCSPlayer::Event_Dying()
 {
 	// do we actually need to use this event?
@@ -1113,7 +1148,7 @@ void CCSPlayer::Event_Killed(const CTakeDamageInfo &info)
 
 	// Note: since we're dead, it won't draw us on the client, but we don't set EF_NODRAW
 	// because we still want to transmit to the clients in our PVS.
-#ifdef TERROR
+#ifdef SBTERROR
 	bool bIsTerror = CSGameRules()->IsTerrorStrikeMap();
 
 	// TODO: This is bad. smoker logic shouldnt be in the gibbing code.
@@ -1192,7 +1227,7 @@ void CCSPlayer::Event_Killed(const CTakeDamageInfo &info)
 		HintMessage( "#Spec_Duck", true, true );
 	}
 
-#ifdef TERROR
+#ifdef SBTERROR
 	if (bIsTerror && terrorstrike_deathalerts.GetBool() && GetTeamNumber() == TEAM_TERRORIST)
 	{
 		for (int i = 0; i < MAX_PLAYERS; i++)
@@ -1222,7 +1257,7 @@ void CCSPlayer::Event_Killed(const CTakeDamageInfo &info)
 
 void CCSPlayer::DeathSound( const CTakeDamageInfo &info )
 {
-#ifdef TERROR
+#ifdef SBTERROR
 	if (CSGameRules()->IsTerrorStrikeMap())
 	{
 		if (GetTeamNumber() == TEAM_CT)
@@ -1601,7 +1636,7 @@ void CCSPlayer::PostThink()
 		m_cycleLatch.GetForModify() = 16 * GetCycle();// 4 point fixed
 	}
 
-#ifdef TERROR
+#ifdef SBTERROR
 	// If we have a voice box then fucking use it.
 	if (m_pVoiceBox && IsZombie())
 	{
@@ -1703,7 +1738,7 @@ bool CCSPlayer::IsArmored( int nHitGroup )
 
 void CCSPlayer::Pain( bool bHasArmour )
 {
-#ifdef TERROR
+#ifdef SBTERROR
 	if (IsZombie())
 	{
 		m_pVoiceBox->PainNoise();
@@ -2421,7 +2456,7 @@ void CCSPlayer::RoundRespawn()
 	OutputDamageTaken();
 	ResetDamageCounters();
 
-#ifdef TERROR
+#ifdef SBTERROR
 	// Should always be cleared.
 	m_IsSmoker = false;
 	m_IsSpecialInfected = false;
@@ -2478,7 +2513,7 @@ void CCSPlayer::ResetMaxSpeed()
 		speed = 240;
 	}
 
-#ifdef TERROR
+#ifdef SBTERROR
 	// Zombies should get bonus speed so the players dont just out run us.
 	if (CSGameRules()->IsTerrorStrikeMap() && GetTeamNumber() == TEAM_CT)
 	{
@@ -2547,7 +2582,7 @@ void CCSPlayer::PreThink()
 		}
 	}
 #endif
-#ifdef TERROR
+#ifdef SBTERROR
 	// We need to check weapon ammo and make sure its not empty.
 	
 	if (CSGameRules()->IsTerrorStrikeMap())
@@ -2929,7 +2964,7 @@ bool CCSPlayer::CanPlayerBuy( bool display )
 		return false;
 	}
 
-#ifdef TERROR
+#ifdef SBTERROR
 	// Don't allow zombies to purchase guns.
 	if (mp->IsTerrorStrikeMap() && GetTeamNumber() == TEAM_CT)
 	{
@@ -4530,10 +4565,21 @@ bool CCSPlayer::HandleCommand_JoinTeam( int team )
 	if ( team == GetTeamNumber() )
 	{
 		// Let people change class (skin) by re-joining the same team
-		if ( GetTeamNumber() == TEAM_TERRORIST && TerroristPlayerModels.Count() > 1 )
+#ifdef SBTERROR
+		if (!CSGameRules()->IsTerrorStrikeMap() && GetTeamNumber() == TEAM_TERRORIST && TerroristPlayerModels.Count() > 1)
 		{
-			ShowViewPortPanel( PANEL_CLASS_TER );
+			ShowViewPortPanel(PANEL_CLASS_TER);
 		}
+		else if (CSGameRules()->IsTerrorStrikeMap() && GetTeamNumber() == TEAM_TERRORIST && SurvivorPlayerModels.Count() > 1)
+		{
+			ShowViewPortPanel(PANEL_CLASS_SURV);
+		}
+#else
+		if (GetTeamNumber() == TEAM_TERRORIST && TerroristPlayerModels.Count() > 1)
+		{
+			ShowViewPortPanel(PANEL_CLASS_TER);
+		}
+#endif
 		else if ( GetTeamNumber() == TEAM_CT && CTPlayerModels.Count() > 1 )
 		{
 			ShowViewPortPanel( PANEL_CLASS_CT );
@@ -5271,10 +5317,21 @@ void CCSPlayer::State_Enter_PICKINGCLASS()
 	PhysObjectSleep();
 
 	// show the class menu:
+#ifdef SBTERROR
+	if ( !CSGameRules()->IsTerrorStrikeMap() && GetTeamNumber() == TEAM_TERRORIST && TerroristPlayerModels.Count() > 1 )
+	{
+		ShowViewPortPanel(PANEL_CLASS_TER);
+	}
+	else if ( CSGameRules()->IsTerrorStrikeMap() && GetTeamNumber() == TEAM_TERRORIST && SurvivorPlayerModels.Count() > 1 )
+	{
+		ShowViewPortPanel(PANEL_CLASS_SURV);
+	}
+#else
 	if ( GetTeamNumber() == TEAM_TERRORIST && TerroristPlayerModels.Count() > 1 )
 	{
-		ShowViewPortPanel( PANEL_CLASS_TER );
+		ShowViewPortPanel(PANEL_CLASS_TER);
 	}
+#endif
 	else if ( GetTeamNumber() == TEAM_CT && CTPlayerModels.Count() > 1 )
 	{
 		ShowViewPortPanel( PANEL_CLASS_CT );
@@ -6413,7 +6470,7 @@ CBaseEntity	*CCSPlayer::GiveNamedItem( const char *pszName, int iSubType )
 		return NULL;
 #endif
 
-#ifdef TERROR
+#ifdef SBTERROR
 	bool IsTerror = false;
 	// Attempt at only giving the bots knifes
 	if (CSGameRules()->IsTerrorStrikeMap() && GetTeamNumber() == TEAM_CT)
@@ -6435,7 +6492,7 @@ CBaseEntity	*CCSPlayer::GiveNamedItem( const char *pszName, int iSubType )
 	pent->SetLocalOrigin( GetLocalOrigin() );
 	pent->AddSpawnFlags( SF_NORESPAWN );
 
-#ifdef TERROR
+#ifdef SBTERROR
 	// Only set for the zombies!
 	if (IsTerror)
 	{

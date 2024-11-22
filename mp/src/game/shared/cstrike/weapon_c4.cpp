@@ -256,7 +256,7 @@ END_PREDICTION_DATA()
 		
 		m_flTimerLength = mp_c4timer.GetInt();
 
-#ifdef TERROR
+#ifdef SBTERROR
 		if (CSGameRules()->IsTerrorStrikeMap())
 		{
 			// should be long enough for a zombie swarm to appear.
@@ -279,7 +279,7 @@ END_PREDICTION_DATA()
 		
 		SpawnControlPanels();
 
-#ifdef TERROR
+#ifdef SBTERROR
 		if (CSGameRules()->IsTerrorStrikeMap())
 		{
 			// Play horde start sound.
@@ -1066,6 +1066,12 @@ void CC4::PrimaryAttack()
 
 	m_flNextPrimaryAttack = gpGlobals->curtime + 0.3;
 	SetWeaponIdleTime( gpGlobals->curtime + SharedRandomFloat("C4IdleTime", 10, 15 ) );
+}
+
+void CC4::DoMuzzleFlash()
+{
+	// Don't do this its a bomb not a gun.
+	return;
 }
 
 void CC4::WeaponIdle()

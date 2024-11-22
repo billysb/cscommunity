@@ -62,6 +62,6 @@ int GetCSLevelIndex( const char *pLevelName )
 		if ( Q_strcmp( pLevelName, pValidStatLevels[i] ) == 0 )
 			return i;
 	}
-
+	
 	return -1;
 }

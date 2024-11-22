@@ -1267,7 +1267,7 @@ private:
 
 	BotChatterInterface m_chatter;									///< chatter mechanism
 
-#ifdef TERROR
+#ifdef SBTERROR
 	int m_iStuckCounter;
 #endif
 };
@@ -1371,7 +1371,7 @@ inline bool CCSBot::IsAlert( void ) const
 
 inline void CCSBot::BecomeAlert( void )
 {
-#ifdef TERROR
+#ifdef SBTERROR
 	// FIXME: We need a better way to do this like a timer.
 	if (!IsAlert())
 	{

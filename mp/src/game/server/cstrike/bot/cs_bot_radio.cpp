@@ -366,9 +366,13 @@ void CCSBot::SpeakAudio( const char *voiceFilename, float duration, int pitch )
 
 	const char* VoiceID = m_profile->GetVoiceID();
 	const char *targetFilename;
+
+	// Allocate memory for the new string
+	char* result = NULL;
+
 	if (VoiceID != NULL)
 	{
-		Msg("Old: %s\n", voiceFilename);
+		//Msg("Old: %s\n", voiceFilename);
 		const char* position = Q_strrchr(voiceFilename, '\\');
 
 		if (position != nullptr)
@@ -380,8 +384,7 @@ void CCSBot::SpeakAudio( const char *voiceFilename, float duration, int pitch )
 			// Calculate the length of the resulting string
 			int newLength = Q_strlen(voiceFilename) + Q_strlen(VoiceID) + 2; // the 2 is the extra \
 
-			// Allocate memory for the new string
-			char* result = new char[newLength + 1];
+			result = new char[newLength + 1];
 
 			// Copy the string up to the '\' character
 			Q_strncpy(result, voiceFilename, index+1);
@@ -396,7 +399,8 @@ void CCSBot::SpeakAudio( const char *voiceFilename, float duration, int pitch )
 
 			// Append the rest of the original string after '\'
 			Q_strcat(result, position + 1, 128);
-			Msg("New: %s\n", result);
+			//Msg("New: %s\n", result);
+
 			targetFilename = result;
 		}
 		else
@@ -409,59 +413,6 @@ void CCSBot::SpeakAudio( const char *voiceFilename, float duration, int pitch )
 		targetFilename = voiceFilename;
 	}
 
-	// Disgusting hack for custom voices here.
-	/*const char* VoiceID = m_profile->GetVoiceID();
-	const char *targetFilename;
-
-	if (VoiceID != NULL)
-	{
-		const char *last_occurrence = NULL;
-		while (*voiceFilename) {
-			if (*voiceFilename == '/') {
-				last_occurrence = voiceFilename;
-			}
-			voiceFilename++;
-		}
-		
-		
-		if (last_occurrence != NULL)
-		{
-			// We now need to calculate the new filename.
-			
-			size_t voiceFilenameLen = strlen(voiceFilename);
-			size_t prefixLen = strlen(VoiceID);
-			
-			// Calculate the length of the part before the filename
-			size_t prefixPos = last_occurrence - voiceFilename + 1;
-
-			// Allocate memory for the new filename
-			char *newFilename = new char[voiceFilenameLen + prefixLen + 2];
-
-			// Copy the part before the filename
-			Q_strncpy(newFilename, voiceFilename, prefixPos);
-
-			// Copy the prefix
-			strcpy(newFilename + prefixPos, VoiceID);
-
-			// Copy the '/' separator
-			newFilename[prefixPos + prefixLen] = '/';
-
-			// Copy the rest of the filename
-			strcpy(newFilename + prefixPos + prefixLen + 1, voiceFilename + prefixPos);
-			targetFilename = newFilename;
-		}
-		else
-		{
-			targetFilename = voiceFilename;
-		}
-	}
-	else
-	{
-		targetFilename = voiceFilename;
-	}
-
-	Msg("New filename: %s\n", targetFilename);*/
-
 	UserMessageBegin ( filter, "RawAudio" );
 		WRITE_BYTE( pitch );
 		WRITE_BYTE( entindex() );
@@ -472,8 +423,11 @@ void CCSBot::SpeakAudio( const char *voiceFilename, float duration, int pitch )
 	GetChatter()->ResetRadioSilenceDuration();
 
 	m_voiceEndTimestamp = gpGlobals->curtime + duration;
-	if (voiceFilename != targetFilename)
-		delete[] targetFilename;
 
+	if (result != nullptr)
+	{
+		delete[] result;
+		// No need to delete targetFilename as it points to the same memory as result
+	}
 }
 

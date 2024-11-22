@@ -45,5 +45,19 @@ const char *TerroristPlayerModelStrings[] =
 	"models/player/t_arctic.mdl",
 	"models/player/t_guerilla.mdl",
 };
+
+#ifdef SBTERROR
+const char *SurvivorPlayerModelStrings[] =
+{
+	"models/player/gregrogers/l4d1/namvet/gregrogers.mdl",
+	"models/player/gregrogers/l4d1/biker/gregrogers.mdl",
+	"models/player/gregrogers/l4d1/manager/gregrogers.mdl",
+	"models/player/gregrogers/l4d1/teenangst/gregrogers.mdl",
+};
+#endif
+
 CUtlVectorInitialized< const char * > CTPlayerModels( CTPlayerModelStrings, ARRAYSIZE( CTPlayerModelStrings ) );
 CUtlVectorInitialized< const char * > TerroristPlayerModels( TerroristPlayerModelStrings, ARRAYSIZE( TerroristPlayerModelStrings ) );
+#ifdef SBTERROR
+CUtlVectorInitialized< const char * > SurvivorPlayerModels( SurvivorPlayerModelStrings, ARRAYSIZE( SurvivorPlayerModelStrings ) );
+#endif

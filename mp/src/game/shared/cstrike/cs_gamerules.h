@@ -104,14 +104,16 @@ public:
 	int   GetHumanTeam();			// TEAM_UNASSIGNED if no restrictions
 
 	bool IsVIPMap() const;
-#ifdef TERROR
+#ifdef SBTERROR
+	bool CheckPlayerBetaStatus();
 	bool IsTerrorStrikeMap() const;
 #endif
 	bool IsBombDefuseMap() const;
 	bool IsHostageRescueMap() const;
 	bool IsIntermission() const;
 	bool IsLogoMap() const;
-#ifdef TERROR
+#ifdef SBTERROR
+#ifndef CLIENT_DLL
 	// lua exposed
 	void CCSGameRules::ForceZombieWaveTime(float newTime);
 	void CCSGameRules::SetTerrorMode(bool newState);
@@ -119,6 +121,7 @@ public:
 
 	bool CCSGameRules::IsNavVisibleBySurvivors(CNavArea *Target);
 	Vector *CCSGameRules::GetNavmeshSpawnSpot(CBasePlayer *pTarget);
+#endif
 #endif
 	bool IsSpawnPointValid( CBaseEntity *pSpot, CBasePlayer *pPlayer );
 
@@ -143,7 +146,7 @@ private:
 	CNetworkVar( float, m_flGameStartTime );
 	CNetworkVar( int, m_iHostagesRemaining );
 	CNetworkVar( bool, m_bMapHasBombTarget );
-#ifdef TERROR
+#ifdef SBTERROR
 	CNetworkVar( bool, m_bIsTerrorStrike );
 #endif
 	CNetworkVar( bool, m_bMapHasRescueZone );
@@ -206,7 +209,7 @@ public:
 
 	virtual void			InitDefaultAIRelationships( void );
 
-	virtual const char *GetGameDescription( void ) { return "Counter-Strike Source: Community Edition"; }  // this is the game name that gets seen in the server browser
+	virtual const char *GetGameDescription( void ) { return "Terror-Strike Source: Preview"; }  // this is the game name that gets seen in the server browser
 	virtual const char *AIClassText(int classType);
 
 	virtual bool FShouldSwitchWeapon( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon );
@@ -228,7 +231,7 @@ public:
 	// Also get rid of all world decals.
 	void CleanUpMap();
 
-#ifdef TERROR
+#ifdef SBTERROR
 	void CCSGameRules::CheckZombieWaveTime();
 #endif
 	void CheckFreezePeriodExpired();
@@ -324,7 +327,7 @@ public:
 
 	bool IsFriendlyFireOn();
 
-#ifdef TERROR
+#ifdef SBTERROR
 	
 	CNavArea CCSGameRules::GetSpawnBasedOnEnt(CBaseEntity *ent);
 	float IncreaseStressLevel();
@@ -344,7 +347,7 @@ public:
 	// GAME TIMES
 	int m_iFreezeTime;		// (From mp_freezetime) - How many seconds long the intro round (when players are frozen) is.
 	float m_flRestartRoundTime;	// the global time when the round is supposed to end, if this is not 0
-#ifdef TERROR
+#ifdef SBTERROR
 	int m_iMaxSpecialsAllowed;
 	int m_iTotalSpecialsActive;
 

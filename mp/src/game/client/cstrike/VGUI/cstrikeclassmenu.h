@@ -46,6 +46,33 @@ public:
 
 extern CUtlVector<CCSClassImagePanel*> g_ClassImagePanels;
 
+//-----------------------------------------------------------------------------
+// Purpose: Draws the Survivor class menu
+//-----------------------------------------------------------------------------
+
+class CClassMenu_SURV : public CClassMenu
+{
+private:
+	DECLARE_CLASS_SIMPLE(CClassMenu_SURV, CClassMenu);
+
+	// Background panel -------------------------------------------------------
+
+public:
+	virtual void PaintBackground();
+	virtual void PerformLayout();
+	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+	bool m_backgroundLayoutFinished;
+
+	// End background panel ---------------------------------------------------
+
+public:
+	CClassMenu_SURV::CClassMenu_SURV(IViewPort *pViewPort);
+	virtual Panel* CreateControlByName(const char *controlName);
+	const char *GetName(void);
+	void ShowPanel(bool bShow);
+	void Update();
+	virtual void SetVisible(bool state);
+};
 
 //-----------------------------------------------------------------------------
 // Purpose: Draws the Terrorist class menu

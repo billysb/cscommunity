@@ -425,7 +425,7 @@ void CCSBot::OnEnteredNavArea( CNavArea *newArea )
 		m_hasVisitedEnemySpawn = true;
 	}
 
-#ifdef TERROR
+#ifdef SBTERROR
 	//TODO: We need a way to get lighting data.
 	/*
 	if (CSGameRules()->IsTerrorStrikeMap() && IsAlive())

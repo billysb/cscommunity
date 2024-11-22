@@ -295,10 +295,21 @@ void C_CSRagdoll::ChooseMinModel( void )
 		else
 		{
 			int index = cl_min_t.GetInt() - 1;
-			if ( index >= 0 && index < TerroristPlayerModels.Count() )
+#ifdef SBTERROR
+			if (CSGameRules()->IsTerrorStrikeMap() && index >= 0 && index < SurvivorPlayerModels.Count())
 			{
-				m_nModelIndex = modelinfo->GetModelIndex( TerroristPlayerModels[index] );
+				m_nModelIndex = modelinfo->GetModelIndex(SurvivorPlayerModels[index]);
 			}
+			else if (!CSGameRules()->IsTerrorStrikeMap() && index >= 0 && index < TerroristPlayerModels.Count())
+			{
+				m_nModelIndex = modelinfo->GetModelIndex(TerroristPlayerModels[index]);
+			}	
+#else
+			if (index >= 0 && index < TerroristPlayerModels.Count())
+			{
+				m_nModelIndex = modelinfo->GetModelIndex(TerroristPlayerModels[index]);
+			}
+#endif
 		}
 	}
 }
@@ -1164,10 +1175,21 @@ void C_CSPlayer::UpdateMinModels( void )
 		else if ( GetTeamNumber() == TEAM_TERRORIST )
 		{
 			int index = cl_min_t.GetInt() - 1;
+#ifdef SBTERROR
+			if (CSGameRules()->IsTerrorStrikeMap() && index >= 0 && index < SurvivorPlayerModels.Count())
+			{
+				modelIndex = modelinfo->GetModelIndex(SurvivorPlayerModels[index]);
+			}
+			else if (!CSGameRules()->IsTerrorStrikeMap() && index >= 0 && index < TerroristPlayerModels.Count())
+			{
+				modelIndex = modelinfo->GetModelIndex(TerroristPlayerModels[index]);
+			}
+#else
 			if ( index >= 0 && index < TerroristPlayerModels.Count() )
 			{
-				modelIndex = modelinfo->GetModelIndex( TerroristPlayerModels[index] );
+				modelIndex = modelinfo->GetModelIndex(TerroristPlayerModels[index]);
 			}
+#endif
 		}
 	}
 

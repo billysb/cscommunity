@@ -1,6 +1,6 @@
 "GameInfo"
 {
-	game	"Counter-Strike Source: Community Edition"
+	game	"Terror-Strike Source: Debug"
 	title	"COUNTER-STRIKE'"
 	title2	"source"
 	type multiplayer_only
