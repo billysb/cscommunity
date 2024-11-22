@@ -120,7 +120,9 @@ BEGIN_NETWORK_TABLE_NOBASE( CCSGameRules, DT_CSGameRules )
 		SendPropFloat( SENDINFO( m_flGameStartTime ), 32, SPROP_NOSCALE ),
 		SendPropInt( SENDINFO( m_iHostagesRemaining ), 4 ),
 		SendPropBool( SENDINFO( m_bMapHasBombTarget ) ),
+#ifdef SBTERROR
 		SendPropBool( SENDINFO( m_bIsTerrorStrike) ),
+#endif
 		SendPropBool( SENDINFO( m_bMapHasRescueZone ) ),
 		SendPropBool( SENDINFO( m_bLogoMap ) ),
 		SendPropBool( SENDINFO( m_bBlackMarket ) )
