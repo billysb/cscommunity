@@ -60,7 +60,7 @@ void CCSClassImagePanel::Paint()
 // ----------------------------------------------------------------------------- //
 // CClassMenu_SURV
 // ----------------------------------------------------------------------------- //
-
+#ifdef SBTERROR
 CClassMenu_SURV::CClassMenu_SURV(IViewPort *pViewPort) : CClassMenu(pViewPort, PANEL_CLASS_SURV)
 {
 	LoadControlSettings("Resource/UI/ClassMenu_SURV.res");
@@ -97,6 +97,7 @@ void CClassMenu_SURV::SetVisible(bool state)
 		}
 	}
 }
+#endif
 
 bool modelExists(const char *search, const CUtlVector< const char * > &names)
 {

@@ -231,12 +231,12 @@ IViewPortPanel* CounterStrikeViewport::CreatePanelByName(const char *szPanelName
 	{
 		newpanel = new CClassMenu_TER( this );	
 	}
-
+#ifdef SBTERROR
 	else if (Q_strcmp(PANEL_CLASS_SURV, szPanelName) == 0)
 	{
 		newpanel = new CClassMenu_SURV(this);
 	}
-
+#endif
 	else if ( Q_strcmp(PANEL_BUY_CT, szPanelName) == 0 )
 	{
 		newpanel = new CCSBuyMenu_CT( this );
@@ -281,7 +281,9 @@ void CounterStrikeViewport::CreateDefaultPanels( void )
 	AddNewPanel( CreatePanelByName( PANEL_TEAM ), "PANEL_TEAM" );
 	AddNewPanel( CreatePanelByName( PANEL_CLASS_CT ), "PANEL_CLASS_CT" );
 	AddNewPanel( CreatePanelByName( PANEL_CLASS_TER ), "PANEL_CLASS_TER" );
+#ifdef SBTERROR
 	AddNewPanel( CreatePanelByName( PANEL_CLASS_SURV ), "PANEL_CLASS_SURV" );
+#endif
 
 	AddNewPanel( CreatePanelByName( PANEL_BUY_CT ), "PANEL_BUY_CT" );
 	AddNewPanel( CreatePanelByName( PANEL_BUY_TER ), "PANEL_BUY_TER" );

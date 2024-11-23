@@ -109,7 +109,9 @@ BEGIN_NETWORK_TABLE_NOBASE( CCSGameRules, DT_CSGameRules )
 		RecvPropFloat( RECVINFO( m_flGameStartTime ) ),
 		RecvPropInt( RECVINFO( m_iHostagesRemaining ) ),
 		RecvPropBool( RECVINFO( m_bMapHasBombTarget ) ),
+#ifdef SBTERROR
 		RecvPropBool( RECVINFO( m_bIsTerrorStrike ) ),
+#endif
 		RecvPropBool( RECVINFO( m_bMapHasRescueZone ) ),
 		RecvPropBool( RECVINFO( m_bLogoMap ) ),
 		RecvPropBool( RECVINFO( m_bBlackMarket ) )
