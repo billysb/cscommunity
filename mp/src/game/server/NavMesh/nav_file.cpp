@@ -15,8 +15,7 @@
 #include "datacache/imdlcache.h"
 
 #ifdef TERROR
-// FIXME: Make this header file -BillySB
-// #include "func_elevator.h"
+#include "func_elevator.h"
 #endif
 
 #include "tier1/lzmaDecoder.h"

@@ -15,6 +15,7 @@ Because if we hardcode it into the bot code shit gets messy and this lets player
 #include "tier0/memdbgon.h"
 
 #define VOICEBOX_ATTACK_TIME 1.8
+#define VOICEBOX_ONFIRE_TIME 1.8
 #define VOICEBOX_UPDATE_TIME 5
 #define VOICEBOX_NOISE_TIME 6
 
@@ -45,7 +46,7 @@ CZVoiceBox::CZVoiceBox(CCSPlayer* me)
 	m_bIsAngry = false;
 	m_bIsSpecial = false;
 	m_bIsSneaking = false;
-
+	m_bIsOnFire = false;
 
 	m_fUpdateOffset = RandomFloat(0.1, 12.5);
 	m_fNoiseOffset = RandomFloat(0.1, 12.5);
@@ -56,6 +57,7 @@ CZVoiceBox::CZVoiceBox(CCSPlayer* me)
 		m_fNextAngerTime = gpGlobals->curtime + VOICEBOX_ANGER_TIME;
 		m_fNextNoiseTime = (gpGlobals->curtime + VOICEBOX_NOISE_TIME) + m_fUpdateOffset;
 		m_fNextUpdateTime = (gpGlobals->curtime + VOICEBOX_UPDATE_TIME) + m_fNoiseOffset;
+		m_fNextScreamTime = 0;
 		m_fLastAttackTime = 0;
 	}
 	else
@@ -134,7 +136,7 @@ void CZVoiceBox::SpawnNoise(void)
 	case VOICEBOX_TYPE_HUMAN:
 		break; // Humans dont speak on spawn.
 	default:
-		body->EmitSound("Zombie.Alert");
+		break; // body->EmitSound("Zombie.Alert");
 	}
 }
 
@@ -206,7 +208,18 @@ void CZVoiceBox::PainNoise(void)
 			body->EmitSound("Boomer.Pain");
 			break;
 		default:
-			body->EmitSound("Zombie.Pain");
+			if (m_bIsOnFire)
+			{
+				if (gpGlobals->curtime > m_fNextScreamTime)
+				{
+					body->EmitSound("Zombie.OnFire");
+					m_fNextScreamTime = gpGlobals->curtime + VOICEBOX_ONFIRE_TIME;
+				}
+			}
+			else
+			{
+				body->EmitSound("Zombie.Pain");
+			}
 	}
 }
 
@@ -317,6 +330,10 @@ void CZVoiceBox::Update(void)
 			CCSBot* bot = (CCSBot*)body;
 			m_bIsAngry = bot->IsAttacking();
 		}
+
+		// Are we on fire? If this works this is stupid.
+		m_bIsOnFire = body->GetBaseAnimating()->IsOnFire();
+		
 	
 		// Don't wastefully update.
 		m_fNextUpdateTime = gpGlobals->curtime + VOICEBOX_UPDATE_TIME + m_fUpdateOffset;

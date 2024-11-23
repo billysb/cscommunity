@@ -50,6 +50,7 @@ static const char *WeaponNames[WEAPON_MAX] =
 		"weapon_glock",
 		"weapon_scout",
 		"weapon_hegrenade",
+		"weapon_molotov",
 		"weapon_xm1014",
 		"weapon_c4",
 		"weapon_mac10",

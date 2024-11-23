@@ -25,9 +25,8 @@
 #include "func_breakablesurf.h"
 
 #ifdef TERROR
-// FIXME: Make this header file -BillySB
-// #include "func_elevator.h"
-// #include "AmbientLight.h"
+#include "func_elevator.h"
+#include "AmbientLight.h"
 #endif
 
 #include "Color.h"
@@ -568,9 +567,8 @@ void CNavArea::ConnectElevators( void )
 	m_elevatorAreas.RemoveAll();
 
 #ifdef TERROR
-	// FIXME: Actually fix this so bots can use elevators. -BillySB
 	// connect elevators
-	/*CFuncElevator *elevator = NULL;
+	CFuncElevator *elevator = NULL;
 	while( ( elevator = (CFuncElevator *)gEntList.FindEntityByClassname( elevator, "func_elevator" ) ) != NULL )
 	{
 		if ( elevator->GetNumFloors() < 2 )
@@ -659,7 +657,7 @@ void CNavArea::ConnectElevators( void )
 				}
 			}
 		}
-	}*/
+	}
 #endif // TERROR
 }
 
@@ -673,9 +671,6 @@ void CNavArea::OnServerActivate( void )
 	ConnectElevators();
 	m_damagingTickCount = 0;
 	ClearAllNavCostEntities();
-
-	UnblockArea(TEAM_ANY);
-	UpdateBlockedFromNavBlockers();
 }
 
 
@@ -689,10 +684,6 @@ void CNavArea::OnRoundRestart( void )
 	ConnectElevators();
 	m_damagingTickCount = 0;
 	ClearAllNavCostEntities();
-
-	// Make sure we unblock blocked areas otherwise pathfinding will break. -BillySB
-	//UnblockArea(TEAM_ANY);
-	UpdateBlockedFromNavBlockers();
 }
 
 
@@ -4642,15 +4633,15 @@ bool CNavArea::IsBlocked( int teamID, bool ignoreNavBlockers ) const
 	{
 		return false;
 	}
-	else if ((m_attributeFlags & NAV_MESH_TRANSIENT) == false)
+	else if ( ( m_attributeFlags & NAV_MESH_TRANSIENT ) == false )
 	{
+		// This fixes bot pathfinding, only blocks areas that need to be checked! - Reece (06/12/20)
 		return false;
 	}
 
 #ifdef TERROR
-	// FIXME: unimplemented macros and attributes! -BillySB
-	//if ( ( teamID == TEAM_SURVIVOR ) && ( m_attributeFlags & CNavArea::NAV_PLAYERCLIP ) )
-	//	return true;
+	if ( ( teamID == TEAM_SURVIVOR ) && ( m_attributeFlags & CNavArea::NAV_PLAYERCLIP ) )
+		return true;
 #endif
 
 	if ( teamID == TEAM_ANY )
@@ -4873,8 +4864,7 @@ void CNavArea::UpdateBlocked( bool force, int teamID )
 	// See if spot is valid
 #ifdef TERROR
 	// don't unblock func_doors
-	//CTraceFilterWalkableEntities filter( NULL, COLLISION_GROUP_PLAYER_MOVEMENT, WALK_THRU_PROP_DOORS | WALK_THRU_BREAKABLES );
-	CTraceFilterWalkableEntities filter( NULL, COLLISION_GROUP_PLAYER_MOVEMENT, WALK_THRU_DOORS | WALK_THRU_BREAKABLES );
+	CTraceFilterWalkableEntities filter( NULL, COLLISION_GROUP_PLAYER_MOVEMENT, WALK_THRU_PROP_DOORS | WALK_THRU_BREAKABLES );
 #else
 	CTraceFilterWalkableEntities filter( NULL, COLLISION_GROUP_PLAYER_MOVEMENT, WALK_THRU_DOORS | WALK_THRU_BREAKABLES );
 #endif
@@ -4896,10 +4886,8 @@ void CNavArea::UpdateBlocked( bool force, int teamID )
 	{
 		// unblock ourself
 #ifdef TERROR
-		//extern ConVar DebugZombieBreakables;
-		//if ( DebugZombieBreakables.GetBool() )
-		// This fixes a broken link when compiling :( -BillySB
-		if ( false )
+		extern ConVar DebugZombieBreakables;
+		if ( DebugZombieBreakables.GetBool() )
 #else
 		if ( false )
 #endif

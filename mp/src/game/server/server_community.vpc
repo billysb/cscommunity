@@ -205,6 +205,13 @@ $Project "Server"
 				$File	"CZVoiceBox.h"
 				$File	"terror_smokersmoke.cpp"
 				$File	"terror_firefloor.cpp"
+				$Folder "SB"
+				{
+					$File	"$SRCDIR\game\shared\cstrike\molotov_projectile.cpp"
+					$File	"$SRCDIR\game\shared\cstrike\molotov_projectile.h"
+					$File	"$SRCDIR\game\shared\cstrike\weapon_molotov.cpp"
+					$File	"$SRCDIR\game\shared\cstrike\weapon_molotov.h"
+				}
 			}
 			$Folder	"Bot"
 			{

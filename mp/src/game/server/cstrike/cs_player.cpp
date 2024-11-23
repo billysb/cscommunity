@@ -3272,6 +3272,11 @@ BuyResult_e CCSPlayer::HandleCommand_Buy( const char *item )
 	Q_snprintf( wpnName, sizeof( wpnName ), "weapon_%s", itemNameUsed );
 
 	CCSWeaponInfo *pWeaponInfo = GetWeaponInfo( (CSWeaponID)ClassnameToWeaponID( wpnName ) );
+
+	//billydebugremove
+	Msg(pWeaponInfo->szPrintName);
+	Msg(pWeaponInfo->szClassName);
+
 	if ( pWeaponInfo == NULL )
 	{
 		if ( Q_stricmp( itemNameUsed, "primammo" ) == 0 )

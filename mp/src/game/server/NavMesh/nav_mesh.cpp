@@ -17,8 +17,7 @@
 #include "utlbuffer.h"
 #include "tier0/vprof.h"
 #ifdef TERROR
-// FIXME: Make this header file -BillySB
-// #include "func_simpleladder.h"
+#include "func_simpleladder.h"
 #endif
 #include "functorutils.h"
 
@@ -398,7 +397,6 @@ public:
 	bool operator()( CNavArea *area )
 	{
 		area->OnRoundRestart();
-		area->UnblockArea(); //billysb
 		return true;
 	}
 
@@ -614,7 +612,7 @@ void CNavMesh::TestAllAreasForBlockedStatus( void )
 	FOR_EACH_VEC( TheNavAreas, pit )
 	{
 		CNavArea *area = TheNavAreas[ pit ];
-		area->UpdateBlocked( false );
+		area->UpdateBlocked( true );
 	}
 }
 
@@ -624,19 +622,8 @@ void CNavMesh::TestAllAreasForBlockedStatus( void )
  */
 void CNavMesh::OnRoundRestart( void )
 {
-	/*
-	So for some reason the built in blocked areas logic is broken. It works fine at first.
-	but after the 1 round it will start blocking random areas for no reason.
-	So we forcefully unblock all areas and the bots will discover what is blocked.
-	
-	It's a hacky solution but at least its playable. -BillySB
-	*/
-	FOR_EACH_VEC(TheNavAreas, pit)
-	{
-		CNavArea *area = TheNavAreas[ pit ];
-		area->UnblockArea(TEAM_ANY);
-	}
-	m_updateBlockedAreasTimer.Start(5.0f);
+	m_updateBlockedAreasTimer.Start( 1.0f );
+
 #ifdef NEXT_BOT
 	FOR_EACH_VEC( TheNavAreas, pit )
 	{
@@ -1110,14 +1097,8 @@ void CNavMesh::LoadPlaceDatabase( void )
 		{
 			if ( FStrEq( key->GetName(), "default" ) )	// default population is the undefined place
 				continue;
-			
-			// TODO: Does this shit even work? -BillySB
-			// It's supposed to copy a string into memory and then add it to the array. but im shit at c++
-			const char *pName = key->GetName();
-			char *out = new char[sizeof(pName)];
 
-			V_strncpy((char*)pName, out, sizeof(pName) + 1);
-			placeNames.AddToTail(  out );
+			placeNames.AddToTail( CloneString( key->GetName() ) );
 		}
 
 		m_placeCount = placeNames.Count();
@@ -2760,8 +2741,7 @@ static ConCommand nav_compress_id( "nav_compress_id", CommandNavCompressID, "Re-
 #ifdef TERROR
 void CommandNavShowLadderBounds( void )
 {
-//FIXME: Ladder debugging -BillySB
-/*	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
 	CFuncSimpleLadder *ladder = NULL;
@@ -2771,7 +2751,7 @@ void CommandNavShowLadderBounds( void )
 		ladder->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
 		ladder->m_debugOverlays |= OVERLAY_TEXT_BIT | OVERLAY_ABSBOX_BIT;
 		NDebugOverlay::Box( vec3_origin, mins, maxs, 0, 255, 0, 0, 600 );
-	}*/
+	}
 }
 static ConCommand nav_show_ladder_bounds( "nav_show_ladder_bounds", CommandNavShowLadderBounds, "Draws the bounding boxes of all func_ladders in the map.", FCVAR_GAMEDLL | FCVAR_CHEAT );
 #endif
@@ -2779,11 +2759,8 @@ static ConCommand nav_show_ladder_bounds( "nav_show_ladder_bounds", CommandNavSh
 //--------------------------------------------------------------------------------------------------------------
 void CommandNavBuildLadder( void )
 {
-	if (!UTIL_IsCommandIssuedByServerAdmin())
-	{
-		DevMsg("Fuck you said valve\n");
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
-	}
 
 	TheNavMesh->CommandNavBuildLadder();
 }
@@ -2837,9 +2814,8 @@ NavAttributeLookup TheNavAttributeTable[] =
 	{ "OBSTACLE_TOP", NAV_MESH_OBSTACLE_TOP },
 	{ "CLIFF", NAV_MESH_CLIFF },
 #ifdef TERROR
-// Unimplemented navmesh attributes -BillySB
-//	{ "PLAYERCLIP", (NavAttributeType)CNavArea::NAV_PLAYERCLIP },
-//	{ "BREAKABLEWALL", (NavAttributeType)CNavArea::NAV_BREAKABLEWALL },
+	{ "PLAYERCLIP", (NavAttributeType)CNavArea::NAV_PLAYERCLIP },
+	{ "BREAKABLEWALL", (NavAttributeType)CNavArea::NAV_BREAKABLEWALL },
 #endif
 	{ NULL, NAV_MESH_INVALID }
 };

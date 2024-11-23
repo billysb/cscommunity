@@ -374,7 +374,7 @@ void CBaseCSGrenade::ItemPostFrame()
 		m_bRedraw = true;
 		m_fThrowTime = 0.0f;
 
-#ifdef TERROR
+#ifdef SBTERROR
 		if (CSGameRules()->IsTerrorStrikeMap())
 		{
 			return;

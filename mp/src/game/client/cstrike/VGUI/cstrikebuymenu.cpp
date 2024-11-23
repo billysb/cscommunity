@@ -419,7 +419,8 @@ const char *g_pWeaponNames[] =
 	" ",
 	"#Cstrike_TitlesTXT_Kevlar_Vest",
 	"#Cstrike_TitlesTXT_Kevlar_Vest_Ballistic_Helmet",
-	"#Cstrike_TitlesTXT_Nightvision_Goggles"
+	"#Cstrike_TitlesTXT_Nightvision_Goggles",
+	"#Cstrike_molotov_Grenade"
 };
 
 int GetWeeklyBargain( void )

@@ -13,8 +13,7 @@
 #include "nav_mesh.h"
 
 #ifdef TERROR
-//FIXME: Implement this header -BillySB
-//#include "terror/TerrorNav.h"
+#include "terror/TerrorNav.h"
 #endif
 
 #ifdef TF_DLL
@@ -31,9 +30,7 @@
 CNavMesh *NavMeshFactory( void )
 {
 #ifdef TERROR
-	//FIXME: actually implement a seperate mesh file. -BillySB
-	//return new TerrorNavMesh;
-	return new CNavMesh;
+	return new TerrorNavMesh;
 #endif
 
 #ifdef TF_DLL

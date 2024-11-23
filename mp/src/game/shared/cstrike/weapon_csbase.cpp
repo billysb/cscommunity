@@ -48,6 +48,7 @@ static const char * s_WeaponAliasInfo[] =
 	"glock",	// WEAPON_GLOCK				// old glock
 	"scout",	// WEAPON_SCOUT
 	"hegren",	// WEAPON_HEGRENADE
+	"molotov",  // WEAPON_MOLOTOV
 	"xm1014",	// WEAPON_XM1014			// auto shotgun
 	"c4",		// WEAPON_C4
 	"mac10",	// WEAPON_MAC10				// T only

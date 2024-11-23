@@ -123,6 +123,7 @@ public:
 	bool	m_helmet;
 	bool	m_smokeGrenade;
 	bool	m_HEGrenade;
+	bool	m_Molotov;
 	int		m_flashbangs;
 	bool	m_defuser;
 	bool	m_nightvision;

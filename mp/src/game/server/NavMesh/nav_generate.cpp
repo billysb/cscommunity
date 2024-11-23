@@ -19,10 +19,8 @@
 #include "fmtstr.h"
 
 #ifdef TERROR
-// FIXME: Make this header file -BillySB
-// #include "func_simpleladder.h"
+#include "func_simpleladder.h"
 #endif
-#include "func_ladder.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -149,14 +147,15 @@ void CNavMesh::BuildLadders( void )
 	// remove any left-over ladders
 	DestroyLadders();
 
-	CFuncLadder *ladder = NULL;
-	while ((ladder = (CFuncLadder*)(gEntList.FindEntityByClassname((CBaseEntity*)ladder, "func_ladder"))) != NULL)
+#ifdef TERROR
+	CFuncSimpleLadder *ladder = NULL;
+	while( (ladder = dynamic_cast< CFuncSimpleLadder * >(gEntList.FindEntityByClassname( ladder, "func_simpleladder" ))) != NULL )
 	{
 		Vector mins, maxs;
 		ladder->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
 		CreateLadder( mins, maxs, 0.0f );
 	}
-
+#endif
 }
 
 
@@ -605,8 +604,7 @@ private:
 void CNavMesh::MarkPlayerClipAreas( void )
 {
 #ifdef TERROR
-//FIXME: More unimplemented navmesh stuff for terrorstrike -BillySB
-	/*FOR_EACH_VEC( TheNavAreas, it )
+	FOR_EACH_VEC( TheNavAreas, it )
 	{
 		TerrorNavArea *area = static_cast< TerrorNavArea * >(TheNavAreas[it]);
 
@@ -620,7 +618,7 @@ void CNavMesh::MarkPlayerClipAreas( void )
 		{
 			area->SetAttributes( area->GetAttributes() | TerrorNavArea::NAV_PLAYERCLIP );
 		}
-	}*/
+	}
 #endif
 }
 

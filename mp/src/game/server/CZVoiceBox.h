@@ -56,6 +56,7 @@ private:
 
 	bool	m_bIsAngry;
 	bool	m_bIsSpecial;
+	bool	m_bIsOnFire;
 	int		m_iSpecialType;
 
 	bool	m_bIsSneaking;
@@ -69,6 +70,9 @@ private:
 
 	// How long until our next idle noise.
 	float	m_fNextNoiseTime;
+
+	// When on fire we dont want to spam pain sounds.
+	float m_fNextScreamTime;
 
 	// This is needed to stop bots from all doing shit at the same time.
 	float	m_fUpdateOffset;

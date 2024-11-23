@@ -15,8 +15,7 @@
 #include "nav_pathfind.h"
 #include "nav_colors.h"
 #ifdef TERROR
-// FIXME: Make this header file -BillySB
-//#include "TerrorShared.h"
+#include "TerrorShared.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -258,9 +257,7 @@ void CNavLadder::SetDir( NavDirType dir )
 	trace_t result;
 #ifdef TERROR
 	// TERROR: use the MASK_ZOMBIESOLID_BRUSHONLY contents, since that's what zombies use
-	//UTIL_TraceLine( from, to, MASK_ZOMBIESOLID_BRUSHONLY, NULL, COLLISION_GROUP_NONE, &result );
-	// FIXME: need to implement the mask above. -BillySB
-	UTIL_TraceLine( from, to, MASK_NPCSOLID_BRUSHONLY, NULL, COLLISION_GROUP_NONE, &result );
+	UTIL_TraceLine( from, to, MASK_ZOMBIESOLID_BRUSHONLY, NULL, COLLISION_GROUP_NONE, &result );
 #else
 	UTIL_TraceLine( from, to, MASK_NPCSOLID_BRUSHONLY, NULL, COLLISION_GROUP_NONE, &result );
 #endif
@@ -460,7 +457,7 @@ void CNavLadder::OnRoundRestart( void )
 //--------------------------------------------------------------------------------------------------------------
 void CNavLadder::FindLadderEntity( void )
 {
-	m_ladderEntity = gEntList.FindEntityByClassnameNearest( "func_ladder", (m_top + m_bottom) * 0.5f, HalfHumanWidth );
+	m_ladderEntity = gEntList.FindEntityByClassnameNearest( "func_simpleladder", (m_top + m_bottom) * 0.5f, HalfHumanWidth );
 }
 
 

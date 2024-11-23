@@ -224,6 +224,21 @@ void WeaponSet::GetCurrent( int& cost, WeaponSet& ws ) const
 	}
 
 	//-------------------------------------------------------------------------
+	// Molotov.
+	// DO NOT UNCOMMENT, it will break prebuy options.
+	/*pWeapon = dynamic_cast< CWeaponCSBase * >(player->GetCSWeapon(WEAPON_MOLOTOV));
+	pInfo = GetWeaponInfo(WEAPON_MOLOTOV);
+	ammoType = (pInfo) ? pInfo->iAmmoType : 0;
+
+	bool hasMolotov = (pWeapon && player->GetAmmoCount(ammoType));
+	if (m_Molotov && !hasMolotov)
+	{
+		cost += pInfo->GetWeaponPrice();
+		ws.m_Molotov = true;
+		hasMolotov = true;
+	}*/
+
+	//-------------------------------------------------------------------------
 	// Flashbang grenades
 	pWeapon = dynamic_cast< CWeaponCSBase * >(player->GetCSWeapon( WEAPON_FLASHBANG ));
 	pInfo = GetWeaponInfo( WEAPON_FLASHBANG );

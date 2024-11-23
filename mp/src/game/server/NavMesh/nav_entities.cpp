@@ -20,9 +20,8 @@
 #include "func_breakablesurf.h"
 
 #ifdef TERROR
-// FIXME: Make this header file -BillySB
-// #include "func_elevator.h"
-// #include "AmbientLight.h"
+#include "func_elevator.h"
+#include "AmbientLight.h"
 #endif
 
 #ifdef TF_DLL

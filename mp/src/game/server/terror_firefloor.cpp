@@ -1,5 +1,6 @@
 /*
 Basic placeholder entity for spawning in fire for the molotov.
+TODO: Particle effect is not spawning why?
 */
 
 #include "cbase.h"
@@ -7,11 +8,12 @@ Basic placeholder entity for spawning in fire for the molotov.
 #include "cs_shareddefs.h"
 #include "nav_mesh.h"
 #include "particle_parse.h"
+#include "cs_gamerules.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define MAX_MOLOTOV_FLAMES 14
+#define MAX_MOLOTOV_FLAMES 18
 
 class CFireFloor : public CBaseAnimating
 {
@@ -36,7 +38,7 @@ public:
 	//void InputToggle(inputdata_t &inputData);
 
 private:
-
+	void CFireFloor::CreateFire(Vector pos, int index);
 	bool	m_bDidFire;
 	int		m_iTotalThinks;
 	float	m_fDmgAmount;
@@ -73,20 +75,34 @@ Vector GetRandomNearbyPosition(CBaseEntity* pEntity, float range) {
 	return randomPosition;
 }
 
+void CFireFloor::CreateFire(Vector Pos, int index)
+{
+	CBaseEntity* pEntity = CreateEntityByName("env_fire");
+	if (pEntity)
+	{
+		variant_t emptyVariant;
+		pEntity->SetAbsOrigin(Pos);
+		pEntity->Spawn();
+		pEntity->Activate();
+		pEntity->AcceptInput("StartFire", this, this, emptyVariant, 0);
+
+	}
+	createdEntities[index] = pEntity;
+}
+
 void CFireFloor::Precache(void)
 {
 	//PrecacheModel("smokergas.mdl");
 	PrecacheParticleSystem("molotov_base");
-	PrecacheScriptSound("BaseSmokeEffect.Sound");
-	PrecacheScriptSound("Terror.SmokerGas");
-
+	PrecacheScriptSound("fire_large");
+	PrecacheScriptSound("PropaneTank.Burst");
 	BaseClass::Precache();
 }
 
 void CFireFloor::Spawn(void)
 {
 	Precache();
-	
+
 	m_iTotalThinks = 0;
 	m_bDidFire = false;
 	//SetModel(NULL_STRING);
@@ -95,10 +111,13 @@ void CFireFloor::Spawn(void)
 
 	m_SpawnArea = TheNavMesh->GetNavArea(GetAbsOrigin());
 	DispatchParticleEffect("molotov_base", GetAbsOrigin(), GetAbsAngles(), this);
-	// Start thinking
-	SetThink(&CFireFloor::Think);
+
+	EmitSound("PropaneTank.Burst");
 
 	SetNextThink(gpGlobals->curtime + 0.05f);
+
+	// Start thinking
+	SetThink(&CFireFloor::Think);
 
 }
 
@@ -106,29 +125,17 @@ void CFireFloor::Think(void)
 {
 	if (!m_bDidFire)
 	{
-		variant_t emptyVariant;
-		CBaseEntity* pEntity = CreateEntityByName("env_fire");
-		if (pEntity)
-		{
-			// Set the position of the entity
-			pEntity->SetAbsOrigin(GetAbsOrigin());
-			pEntity->Spawn();
-			pEntity->Activate();
-			pEntity->AcceptInput("StartFire", this, this, emptyVariant, 0);
-
-			// Store the entity in the array
-			createdEntities[MAX_MOLOTOV_FLAMES] = pEntity;
-		}
+		EmitSound("fire_large");
+		
+		CreateFire(GetAbsOrigin(), MAX_MOLOTOV_FLAMES);
 
 		int counter = 0;
-		while (counter < 10)
+		while (counter < (MAX_MOLOTOV_FLAMES - 1))
 		{
 			// Create Vector for direction
-			Vector vecDir(0, 0, 50);
 			Vector vecOffset(0, 0, 5);
 
 			Vector newpos = GetRandomNearbyPosition(this, 150.0f);
-			//UTIL_AddDebugLine(newpos, GetAbsOrigin(), false, false);
 
 			// Get the Start/End
 			Vector vecAbsStart = GetAbsOrigin() + vecOffset;
@@ -140,41 +147,39 @@ void CFireFloor::Think(void)
 
 			if (!tr.DidHitWorld())
 			{
-				Msg("I did it :D\n");
-				// did not hit the world.
-				//DispatchParticleEffect("fire_medium_02_nosmoke", vecAbsEnd, GetAbsAngles(), this);
+				// Spawn fire at current location.
 				UTIL_AddDebugLine(vecAbsStart, vecAbsEnd, false, false);
-				CBaseEntity* pEntity = CreateEntityByName("env_fire");
-				if (pEntity)
-				{
-					// Set the position of the entity
-					pEntity->SetAbsOrigin(vecAbsEnd);
-					pEntity->Spawn();
-					pEntity->Activate();
-					pEntity->AcceptInput("StartFire", this, this, emptyVariant, 0);
-
-					// Store the entity in the array
-					createdEntities[counter] = pEntity;
-				}
 			}
 			else
 			{
-				Vector hitpos = tr.endpos;
-				UTIL_AddDebugLine(vecAbsStart, hitpos, false, false);
-				//DispatchParticleEffect("fire_medium_02_nosmoke", hitpos, GetAbsAngles(), this);
-				CBaseEntity* pEntity = CreateEntityByName("env_fire");
-				if (pEntity)
-				{
-					// Set the position of the entity
-					pEntity->SetAbsOrigin(hitpos);
-					pEntity->Spawn();
-					pEntity->Activate();
-					pEntity->AcceptInput("StartFire", this, this, emptyVariant, 0);
+				// A second pass allows the fire to have more reach in maps with lots of steps / displacements. 
+				// Can be a little weird at times but for the most part works really well.
+				UTIL_AddDebugLine(vecAbsStart, vecAbsEnd, false, false);
 
-					// Store the entity in the array
-					createdEntities[counter] = pEntity;
+				// We hit the world. Quickly check if we can trace to the original end position if slightly raised.
+				Vector newoffset = Vector(0, 0, 50);
+				Vector quickstart = (vecAbsStart - vecAbsEnd) + newoffset;
+				Vector quickend = (vecAbsEnd + newoffset);
+
+				trace_t tr2;
+				//vecAbsEnd = tr.endpos;
+
+				if (!tr2.DidHitWorld())
+				{
+					// Fantastic!
+					vecAbsEnd = quickend;
+					UTIL_TraceLine(quickstart, quickend, MASK_SOLID, this, COLLISION_GROUP_DEBRIS, &tr);
+				}
+				else
+				{
+					// Probably still a better position.
+					vecAbsEnd = tr2.endpos;
+					UTIL_TraceLine(quickstart, vecAbsEnd, MASK_SOLID, this, COLLISION_GROUP_DEBRIS, &tr);
 				}
 			}
+
+			// Create the flame.
+			CreateFire(vecAbsEnd, counter);
 			++counter;
 		}
 		m_bDidFire = true;
@@ -197,6 +202,8 @@ void CFireFloor::Think(void)
 
 			// Must destroy self.
 			StopParticleEffects(this);
+			//StopLoopingSounds(); // This doesnt do shit?
+			StopSound("fire_large");
 			Msg("I am fucking dead, deleted from reality.\n");
 			Remove();
 		}
@@ -219,24 +226,54 @@ void CFireFloor::Think(void)
 				if (ppEnts[i] == NULL)
 					continue;
 
-				// Zap metal or flesh things.
 				if (!ppEnts[i]->IsPlayer())
 					continue;
 
-				// Valid player. Do damage.
+				// Valid player or npc. Do damage.
 				if (ppEnts[i]->IsAlive())//&& m_iTotalThinks <= 40)
 				{
 					// TODO: We need a more intelligent way to damage enemies.
 					
-					CTakeDamageInfo dmginfo;
-					dmginfo.SetAttacker(this);
-					dmginfo.SetInflictor(this);
+					Vector Offset = Vector(0, 0, 50);
+					Vector vecAbsStart = (GetAbsOrigin() + Offset);
+					Vector vecAbsEnd = ppEnts[i]->GetAbsOrigin();
 
-					dmginfo.SetDamage(m_fDmgAmount);
-					dmginfo.AddDamageType(DMG_BURN);
-					dmginfo.SetMaxDamage(10);
+					trace_t tr;
 
-					ppEnts[i]->TakeDamage(dmginfo);
+					//ugh hacky because the zombies use this collision group
+					UTIL_TraceLine(vecAbsStart, vecAbsEnd, MASK_PLAYERSOLID, this, COLLISION_GROUP_DEBRIS, &tr);
+
+					// Can't see the target. dont hurt because they could be in a room above or below us. / nothing to burn.
+					if (!tr.DidHit() || tr.DidHitWorld())
+						continue;
+
+					// if we hit an entity that was not the world.
+					if (!tr.DidHitNonWorldEntity())
+						continue;
+
+					CBaseEntity *target = tr.m_pEnt;
+
+					Msg("Yes!\n");
+
+					if (target != NULL)
+					{
+						Msg("Yes2!\n");
+						CTakeDamageInfo dmginfo;
+						dmginfo.SetAttacker(this);
+						dmginfo.SetInflictor(this);
+
+						dmginfo.SetDamage(m_fDmgAmount);
+						dmginfo.AddDamageType(DMG_BURN);
+						dmginfo.SetMaxDamage(10);
+
+						ppEnts[i]->TakeDamage(dmginfo);
+
+						if (CSGameRules()->IsTerrorStrikeMap() && ppEnts[i]->GetTeamNumber() == TEAM_CT)
+						{
+							// if its terror-strike mode and we are a zombie we burn >:D
+							ppEnts[i]->GetBaseAnimating()->Ignite(30.0f, false, 5.0f, false);
+						}
+					}
 
 					//delete &dmginfo;
 				}
