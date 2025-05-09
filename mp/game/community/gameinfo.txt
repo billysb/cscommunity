@@ -1,7 +1,7 @@
 "GameInfo"
 {
 	game	"Terror-Strike Source: Debug"
-	title	"COUNTER-STRIKE'"
+	title	"TERROR-STRIKE'"
 	title2	"source"
 	type multiplayer_only
 	nomodels 1

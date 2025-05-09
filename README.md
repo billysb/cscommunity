@@ -52,3 +52,4 @@ Although this mod is based on SourcePlusPlus's CSS Port, some things will not wo
 |         **BillySB**          |                   **Basic Terror-Strike gamemode**                    |
 |         **Sregor**          |                   **Left 4 Dead common infected player models.**                    |
 |   **FriskTheFallenHuman**   |                **Original cscommunity repo that this fork builds on**    |
+| **BillyBlueberry** | **Game icon recreation** |
